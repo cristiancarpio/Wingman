@@ -4,9 +4,11 @@
   "description": "Tu coach personal de conquista potenciado por inteligencia artificial",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "background_color": "#06060f",
-  "theme_color": "#06060f",
+  "theme_color": "#050508",
   "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "icon-192.png",

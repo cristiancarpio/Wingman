@@ -373,10 +373,7 @@ body{
 .tc:active{transform:scale(.97);}
 .tc.wide{grid-column:span 2;}
 .tc.pro::after{
-  content:'PRO';position:absolute;top:10px;right:10px;
-  font-size:.55rem;font-weight:700;letter-spacing:.1em;
-  color:var(--cu);background:rgba(184,115,51,.1);
-  border:1px solid rgba(184,115,51,.2);padding:2px 7px;border-radius:99px;
+  content:'';display:none;
 }
 .tc-icon{font-size:1.7rem;margin-bottom:9px;display:block;line-height:1;}
 .tc-name{font-size:.92rem;font-weight:700;line-height:1.2;margin-bottom:3px;letter-spacing:-.01em;}
@@ -784,6 +781,99 @@ select option{background:var(--depth);}
 @media(max-width:679px){
   .install-fab{bottom:calc(80px + var(--sab));}
 }
+
+/* ── FULLSCREEN PWA ── */
+@media(display-mode: standalone),(display-mode: fullscreen){
+  html,body{height:100%;overflow:hidden;}
+  .install-fab{display:none!important;}
+  #ni-install{display:none!important;}
+  #btn-install-hdr{display:none!important;}
+  #inst-bar{display:none!important;}
+}
+
+/* ── INSTALL MODAL ── */
+.inst-modal-bg{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(18px);
+  align-items:flex-end;justify-content:center;padding:0;
+}
+.inst-modal-bg.on{display:flex;}
+.inst-sheet{
+  background:var(--abyss);
+  border:1px solid rgba(184,115,51,.18);
+  border-radius:28px 28px 0 0;
+  padding:28px 22px calc(28px + var(--sab));
+  width:100%;max-width:500px;
+  animation:sheetUp .38s cubic-bezier(.4,0,.2,1) both;
+  position:relative;
+}
+.inst-handle{width:36px;height:4px;background:var(--fog3);border-radius:99px;margin:0 auto 24px;}
+.inst-modal-x{
+  position:absolute;top:20px;right:20px;
+  width:30px;height:30px;background:var(--fog4);border:none;
+  border-radius:50%;color:var(--fog2);font-size:.85rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.inst-modal-x:hover{background:var(--fog3);color:var(--chalk);}
+.inst-hero{text-align:center;margin-bottom:22px;}
+.inst-app-icon{
+  width:72px;height:72px;border-radius:20px;margin:0 auto 14px;
+  background:linear-gradient(135deg,#6b3a1f,var(--cu),var(--cu2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:#fff;
+  box-shadow:0 0 40px rgba(184,115,51,.4),0 8px 24px rgba(0,0,0,.5);
+}
+.inst-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;margin-bottom:4px;}
+.inst-subtitle{font-size:.78rem;color:var(--fog2);font-weight:400;}
+.inst-perks{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;
+  margin-bottom:22px;
+}
+.inst-perk{
+  background:rgba(184,115,51,.05);
+  border:1px solid rgba(184,115,51,.12);
+  border-radius:13px;padding:12px 13px;
+  display:flex;align-items:flex-start;gap:9px;
+}
+.inst-perk-icon{font-size:1.2rem;line-height:1;margin-top:1px;flex-shrink:0;}
+.inst-perk-text{font-size:.73rem;color:var(--fog);line-height:1.4;font-weight:500;}
+.inst-perk-text strong{color:var(--chalk);display:block;margin-bottom:1px;font-weight:700;}
+
+/* Platform-specific instructions */
+.inst-platform{display:none;}
+.inst-platform.on{display:block;}
+.inst-steps{
+  background:rgba(184,115,51,.04);border:1px solid rgba(184,115,51,.12);
+  border-radius:14px;padding:16px;margin-bottom:18px;
+}
+.inst-step{
+  display:flex;align-items:flex-start;gap:11px;
+  margin-bottom:11px;
+}
+.inst-step:last-child{margin-bottom:0;}
+.inst-step-n{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#5a3010,var(--cu));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:800;color:#fff;margin-top:1px;
+}
+.inst-step-txt{font-size:.8rem;color:var(--fog);line-height:1.5;font-weight:400;}
+.inst-step-txt strong{color:var(--chalk);}
+.inst-step-icon{font-size:1rem;margin-left:2px;}
+.btn-inst-main{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,#5a3010,var(--cu),var(--cu2));
+  color:#fff;border:none;border-radius:14px;
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+  letter-spacing:.03em;cursor:pointer;transition:all .25s;
+  box-shadow:0 6px 30px rgba(184,115,51,.35);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  margin-bottom:10px;
+}
+.btn-inst-main:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(184,115,51,.5);}
+.btn-inst-main:active{transform:scale(.98);}
+.btn-inst-main:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.inst-note{text-align:center;font-size:.65rem;color:var(--fog2);line-height:1.6;}
 </style>
 </head>
 <body>
@@ -864,7 +954,7 @@ select option{background:var(--depth);}
       <div class="gem" id="g1"></div>
       <div class="gem" id="g2"></div>
     </div>
-    <button class="btn-pro" onclick="openModal()">⚡ PRO</button>
+    <button class="btn-pro" id="btn-install-hdr" onclick="openInstallModal()" style="display:none;">📲 Instalar</button>
   </div>
 </div>
 
@@ -905,6 +995,62 @@ select option{background:var(--depth);}
     </div>
     <button class="btn-pay" onclick="handlePay()">Comenzar — 7 días gratis</button>
     <div class="modal-note">Sin compromisos · Cancelás cuando querés · Pago seguro</div>
+  </div>
+</div>
+
+<!-- Install Modal -->
+<div class="inst-modal-bg" id="inst-modal">
+  <div class="inst-sheet">
+    <div class="inst-handle"></div>
+    <button class="inst-modal-x" onclick="closeInstallModal()">✕</button>
+    <div class="inst-hero">
+      <div class="inst-app-icon">W</div>
+      <div class="inst-title">WingmanAI</div>
+      <div class="inst-subtitle">Tu coach siempre a mano · Sin abrir el browser</div>
+    </div>
+    <div class="inst-perks">
+      <div class="inst-perk">
+        <div class="inst-perk-icon">⚡</div>
+        <div class="inst-perk-text"><strong>Acceso instantáneo</strong>Directo desde tu inicio</div>
+      </div>
+      <div class="inst-perk">
+        <div class="inst-perk-icon">📴</div>
+        <div class="inst-perk-text"><strong>Sin distracciones</strong>Pantalla completa, sin barras</div>
+      </div>
+      <div class="inst-perk">
+        <div class="inst-perk-icon">🔔</div>
+        <div class="inst-perk-text"><strong>Ícono nativo</strong>Como cualquier app</div>
+      </div>
+      <div class="inst-perk">
+        <div class="inst-perk-icon">🚀</div>
+        <div class="inst-perk-text"><strong>Más rápido</strong>Carga en segundos</div>
+      </div>
+    </div>
+    <!-- Android / Desktop Chrome / Edge -->
+    <div class="inst-platform" id="inst-android">
+      <button class="btn-inst-main" id="btn-inst-main" onclick="doInstall()">
+        <span>📲</span><span>Instalar WingmanAI</span>
+      </button>
+      <div class="inst-note">Gratis · Sin pasar por ninguna tienda · Directo a tu pantalla</div>
+    </div>
+    <!-- iOS Safari -->
+    <div class="inst-platform" id="inst-ios">
+      <div class="inst-steps">
+        <div class="inst-step"><div class="inst-step-n">1</div><div class="inst-step-txt">Tocá el botón <strong>Compartir</strong> ⬆️ en la barra de Safari</div></div>
+        <div class="inst-step"><div class="inst-step-n">2</div><div class="inst-step-txt">Deslizá y tocá <strong>"Agregar a pantalla de inicio"</strong> ➕</div></div>
+        <div class="inst-step"><div class="inst-step-n">3</div><div class="inst-step-txt">Confirmá tocando <strong>"Agregar"</strong> — ¡listo!</div></div>
+      </div>
+      <div class="inst-note">Requiere <strong style="color:var(--cu2)">Safari</strong> en iPhone o iPad</div>
+    </div>
+    <!-- Desktop otros browsers -->
+    <div class="inst-platform" id="inst-desktop-other">
+      <div class="inst-steps">
+        <div class="inst-step"><div class="inst-step-n">1</div><div class="inst-step-txt">Abrí esta página en <strong>Google Chrome</strong> o <strong>Microsoft Edge</strong></div></div>
+        <div class="inst-step"><div class="inst-step-n">2</div><div class="inst-step-txt">Hacé clic en el ícono <strong>instalar ⊕</strong> en la barra de direcciones</div></div>
+        <div class="inst-step"><div class="inst-step-n">3</div><div class="inst-step-txt">Confirmá — aparece en tu escritorio como app</div></div>
+      </div>
+      <div class="inst-note">Compatible con Chrome, Edge y Safari (iOS)</div>
+    </div>
   </div>
 </div>
 
@@ -992,7 +1138,7 @@ select option{background:var(--depth);}
     <div class="ob-icon sp">✦</div>
     <div class="ob-badge">Listo para empezar</div>
     <h1 class="ob-h">Tu perfil<br>está <em>listo.</em></h1>
-    <p class="ob-p">Tenés 3 análisis gratuitos. Usalos bien. Con PRO desbloqueás todo sin límites.</p>
+    <p class="ob-p">Modo testing activo — todas las funciones desbloqueadas sin límite de usos.</p>
     <div class="ob-preview">
       <div class="ob-preview-label">Lo que podés hacer hoy</div>
       <div class="ob-preview-text">
@@ -1494,7 +1640,7 @@ select option{background:var(--depth);}
   <button class="ni" id="ni-chat" onclick="openTool('chat')"><span class="ni-icon">💬</span><span class="ni-label">Chat</span></button>
   <button class="ni" id="ni-imagen" onclick="openTool('imagen')"><span class="ni-icon">🪞</span><span class="ni-label">Imagen</span></button>
   <button class="ni" id="ni-hist" onclick="openHist()"><span class="ni-icon">📋</span><span class="ni-label">Historial</span></button>
-  <button class="ni" id="ni-pro" onclick="openModal()"><span class="ni-icon">👑</span><span class="ni-label">PRO</span></button>
+  <button class="ni" id="ni-install" onclick="openInstallModal()"><span class="ni-icon">📲</span><span class="ni-label">Instalar</span></button>
 </div>
 
   </div><!-- /phone-shell -->
@@ -1574,7 +1720,7 @@ select option{background:var(--depth);}
 /* ════════════════════════════════
    STATE
 ════════════════════════════════ */
-let credits = 3;
+let credits = 999;
 let userProfile = {};
 let imgBase64=null, imgMime=null;
 let deferredInstall=null;
@@ -1586,16 +1732,41 @@ let currentPanel=null;
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
+
+// Detect platform
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isAndroid = /android/i.test(navigator.userAgent);
+const isMobile = isIOS || isAndroid;
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  || window.navigator.standalone === true;
+
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); deferredInstall=e;
-  // Show FAB after 3 seconds
+  // Show install button in header
+  const hdrBtn = document.getElementById('btn-install-hdr');
+  if(hdrBtn) hdrBtn.style.display='';
+  // FAB after 4s
   setTimeout(()=>{
-    const fab = document.getElementById('install-fab');
-    fab.classList.add('show');
-  }, 3000);
-  // Also show inline banner on mobile
-  setTimeout(()=>document.getElementById('inst-bar').classList.add('on'), 8000);
+    if(!isStandalone){
+      const fab = document.getElementById('install-fab');
+      fab.classList.add('show');
+    }
+  }, 4000);
+  // Inline banner on mobile after 10s
+  setTimeout(()=>{
+    if(!isStandalone) document.getElementById('inst-bar').classList.add('on');
+  }, 10000);
 });
+
+// On iOS always show install hint (no beforeinstallprompt)
+if(isIOS && !isStandalone){
+  setTimeout(()=>{
+    const hdrBtn = document.getElementById('btn-install-hdr');
+    if(hdrBtn) hdrBtn.style.display='';
+    document.getElementById('install-fab').classList.add('show');
+  }, 5000);
+}
 
 document.getElementById('btn-inst').addEventListener('click',()=>{
   if(deferredInstall){
@@ -1605,6 +1776,8 @@ document.getElementById('btn-inst').addEventListener('click',()=>{
       document.getElementById('inst-bar').classList.remove('on');
       document.getElementById('install-fab').classList.remove('show');
     });
+  } else {
+    openInstallModal();
   }
 });
 
@@ -1616,14 +1789,61 @@ function triggerInstall(){
       document.getElementById('install-fab').classList.remove('show');
     });
   } else {
-    // iOS fallback
-    showToast('En iOS: Safari → Compartir → Agregar al inicio 📲','📱');
+    openInstallModal();
   }
 }
 
 function dismissFab(e){
   e.stopPropagation();
   document.getElementById('install-fab').classList.remove('show');
+}
+
+/* ── Install Modal ── */
+function openInstallModal(){
+  const modal = document.getElementById('inst-modal');
+  // Show correct platform section
+  document.getElementById('inst-android').classList.remove('on');
+  document.getElementById('inst-ios').classList.remove('on');
+  document.getElementById('inst-desktop-other').classList.remove('on');
+
+  if(deferredInstall){
+    // Chrome/Edge Android or Desktop — can install natively
+    document.getElementById('inst-android').classList.add('on');
+  } else if(isIOS && isSafari){
+    document.getElementById('inst-ios').classList.add('on');
+  } else if(isIOS && !isSafari){
+    // iOS but not Safari — show ios steps anyway
+    document.getElementById('inst-ios').classList.add('on');
+  } else {
+    document.getElementById('inst-desktop-other').classList.add('on');
+  }
+
+  modal.classList.add('on');
+}
+
+function closeInstallModal(){
+  document.getElementById('inst-modal').classList.remove('on');
+}
+
+document.getElementById('inst-modal').addEventListener('click', e=>{
+  if(e.target === document.getElementById('inst-modal')) closeInstallModal();
+});
+
+function doInstall(){
+  if(deferredInstall){
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(result=>{
+      if(result.outcome==='accepted'){
+        closeInstallModal();
+        document.getElementById('install-fab').classList.remove('show');
+        document.getElementById('inst-bar').classList.remove('on');
+        const hdrBtn = document.getElementById('btn-install-hdr');
+        if(hdrBtn) hdrBtn.style.display='none';
+        showToast('¡Instalado! Buscalo en tu pantalla 🎉','📲');
+      }
+      deferredInstall=null;
+    });
+  }
 }
 
 /* ════════════════════════════════
@@ -1668,6 +1888,12 @@ function openTool(id){
   document.getElementById('hist-panel').classList.remove('on');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.getElementById('panel-'+id).classList.add('on');
+  // Reset score meter when opening chat
+  if(id==='chat'){
+    document.getElementById('score-chat').style.display='none';
+    document.getElementById('score-chat-ring').style.strokeDashoffset='188';
+    document.getElementById('score-chat-num').textContent='0';
+  }
   currentPanel=id; setNav(id);
 }
 
@@ -1718,15 +1944,18 @@ function setImgModo(modo,btn){
    CREDITS
 ════════════════════════════════ */
 function updateGems(){
-  for(let i=0;i<3;i++) document.getElementById('g'+i).classList.toggle('off',i>=credits);
+  // Testing mode: all gems on
+  for(let i=0;i<3;i++) document.getElementById('g'+i).classList.remove('off');
 }
 
 function useCredit(){
-  if(credits<=0){openModal();return false;}
-  credits--;updateGems();return true;
+  // Testing mode: no credit limit
+  return true;
 }
 
-function refund(){credits++;updateGems();}
+function refund(){
+  // No-op in testing mode
+}
 
 /* ════════════════════════════════
    MODAL
@@ -1873,12 +2102,17 @@ function viewHist(i){
   const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
   const h=hist[i];
   if(!h)return;
-  // Open the relevant panel and show result
-  openTool(h.tool==='Analizar Chat'?'chat':h.tool==='Primer Mensaje'?'primer':h.tool==='Asesor de Imagen'?'imagen':h.tool.toLowerCase());
+  const nameToId={
+    'Analizar Chat':'chat','Primer Mensaje':'primer','Asesor de Imagen':'imagen',
+    'Perfil':'perfil','Cita Perfecta':'cita','Señales':'senales',
+    'Anti-Ghosting':'ghosting','Compatibilidad':'compat','Coach Personal':'coach',
+    'Emergencia':'emergencia','Análisis por Voz':'audio','Cita en Vivo':'live'
+  };
+  const panelId=nameToId[h.tool]||h.tool.toLowerCase();
+  openTool(panelId);
   setTimeout(()=>{
-    const bodyId='res-'+( h.tool==='Analizar Chat'?'chat':h.tool==='Primer Mensaje'?'primer':h.tool==='Asesor de Imagen'?'imagen':h.tool.toLowerCase() )+'-body';
-    const el=document.getElementById(bodyId);
-    if(el){el.textContent=h.full||h.text;el.closest('.res-card').classList.add('on');}
+    const bodyEl=document.getElementById('res-'+panelId+'-body');
+    if(bodyEl){bodyEl.textContent=h.full||h.text;bodyEl.closest('.res-card').classList.add('on');}
   },200);
 }
 
@@ -1945,7 +2179,7 @@ FORMATO: Secciones con emojis. Puntuación X/10 al inicio. Terminá con look def
 
 async function callAPI(messages,sys){
   const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+    method:'POST',headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages})
   });
   const d=await r.json();
