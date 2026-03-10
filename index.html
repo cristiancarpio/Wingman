@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050508">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WingmanAI">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>WingmanAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════
+   WINGMAN AI — OBSIDIAN COPPER EDITION v3
+   Philosophy: Brutally premium. Unashamedly expensive.
+   Copper veins on black obsidian.
+════════════════════════════════════════════ */
+:root {
+  --void:   #050508;
+  --abyss:  #09090e;
+  --depth:  #0f0f18;
+  --surface:#161622;
+  --lift:   #1e1e2e;
+  --cu:     #b87333;   /* copper */
+  --cu2:    #d4956a;
+  --cu3:    #e8c49a;
+  --cu4:    #f5e6d3;
+  --ember:  #ff6b35;
+  --wire:   rgba(184,115,51,0.15);
+  --wire2:  rgba(184,115,51,0.08);
+  --seam:   rgba(255,255,255,0.06);
+  --seam2:  rgba(255,255,255,0.1);
+  --chalk:  #f0ecff;
+  --fog:    rgba(240,236,255,0.55);
+  --fog2:   rgba(240,236,255,0.3);
+  --fog3:   rgba(240,236,255,0.12);
+  --fog4:   rgba(240,236,255,0.06);
+  --sab: env(safe-area-inset-bottom,0px);
+  --sat: env(safe-area-inset-top,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{height:100%;overflow:hidden;}
+body{
+  background:var(--void);color:var(--chalk);
+  font-family:'Syne',sans-serif;
+  height:100%;overflow:hidden;
+  display:flex;flex-direction:column;
+  position:relative;
+}
+
+/* ── CUSTOM CURSOR (desktop) ── */
+@media(pointer:fine){
+  body{cursor:none;}
+  .cursor{
+    position:fixed;width:10px;height:10px;
+    background:var(--cu);border-radius:50%;
+    pointer-events:none;z-index:99999;
+    transform:translate(-50%,-50%);
+    transition:width .2s,height .2s,opacity .2s;
+    mix-blend-mode:screen;
+    box-shadow:0 0 12px var(--cu);
+  }
+  .cursor-ring{
+    position:fixed;width:32px;height:32px;
+    border:1px solid rgba(184,115,51,0.5);
+    border-radius:50%;pointer-events:none;
+    z-index:99998;transform:translate(-50%,-50%);
+    transition:transform .08s ease,width .2s,height .2s;
+  }
+  body:has(button:hover) .cursor,
+  body:has(a:hover) .cursor{width:16px;height:16px;}
+}
+
+/* ── CANVAS BACKGROUND ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;}
+
+/* ── GRAIN ── */
+.grain{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  opacity:.35;
+}
+
+/* ── STATUS BAR ── */
+.sbar{height:var(--sat);background:var(--void);flex-shrink:0;}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 12px;
+  border-bottom:1px solid var(--seam);
+  flex-shrink:0;z-index:10;position:relative;
+  background:rgba(5,5,8,.92);backdrop-filter:blur(24px);
+}
+.hdr-logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#6b3a1f,var(--cu),var(--cu2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:17px;font-weight:900;
+  color:#fff;letter-spacing:-1px;
+  box-shadow:0 0 24px rgba(184,115,51,.35),inset 0 1px 0 rgba(255,255,255,.2);
+  flex-shrink:0;position:relative;overflow:hidden;
+}
+.logo-mark::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+}
+.logo-words{line-height:1.1;}
+.logo-name{font-size:1rem;font-weight:800;letter-spacing:.02em;}
+.logo-sub{font-size:.56rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cu2);margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.gems{display:flex;gap:4px;align-items:center;padding:6px 10px;background:var(--fog4);border:1px solid var(--seam);border-radius:99px;}
+.gem{width:7px;height:7px;border-radius:50%;background:var(--cu);box-shadow:0 0 8px var(--cu);transition:all .4s;}
+.gem.off{background:var(--fog3);box-shadow:none;}
+.btn-pro{
+  padding:7px 14px;
+  background:linear-gradient(135deg,#6b3a1f,var(--cu));
+  color:#fff;border:none;border-radius:99px;
+  font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 2px 14px rgba(184,115,51,.35);
+  transition:all .2s;
+}
+.btn-pro:hover{box-shadow:0 4px 24px rgba(184,115,51,.55);transform:translateY(-1px);}
+
+/* ── INSTALL BANNER ── */
+.install-bar{
+  display:none;align-items:center;gap:10px;
+  padding:9px 16px;
+  background:rgba(184,115,51,.07);
+  border-bottom:1px solid rgba(184,115,51,.15);
+  flex-shrink:0;
+}
+.install-bar.on{display:flex;}
+.install-bar span{flex:1;font-size:.76rem;color:var(--fog);font-weight:400;}
+.install-bar strong{color:var(--cu2);}
+.btn-inst{padding:5px 13px;background:rgba(184,115,51,.15);border:1px solid rgba(184,115,51,.3);border-radius:8px;color:var(--cu2);font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.06em;transition:all .2s;}
+.btn-inst:hover{background:rgba(184,115,51,.25);}
+.btn-dis{background:none;border:none;color:var(--fog2);cursor:pointer;font-size:.9rem;padding:0 4px;}
+
+/* ── BODY ── */
+.app{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+
+/* ══════════════════════════════════
+   ONBOARDING / SPLASH
+══════════════════════════════════ */
+.onboard{
+  display:flex;flex-direction:column;
+  flex:1;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.ob-step{
+  display:none;
+  flex-direction:column;align-items:center;
+  padding:40px 28px 32px;
+  flex:1;text-align:center;
+  animation:fadeUp .5s ease both;
+}
+.ob-step.active{display:flex;}
+
+.ob-icon{
+  width:88px;height:88px;border-radius:28px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;margin-bottom:28px;
+  position:relative;
+}
+.ob-icon.cu{background:linear-gradient(135deg,#3d1f08,var(--cu),var(--cu2));box-shadow:0 0 60px rgba(184,115,51,.3),0 8px 32px rgba(0,0,0,.5);}
+.ob-icon.em{background:linear-gradient(135deg,#1a0a00,#d4400a,#ff8c42);box-shadow:0 0 60px rgba(255,107,53,.25);}
+.ob-icon.sp{background:linear-gradient(135deg,#0a1a0a,#1a6b2a,#4ade80);box-shadow:0 0 60px rgba(74,222,128,.2);}
+.ob-icon{animation:levitate 4s ease-in-out infinite;}
+
+@keyframes levitate{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-10px) rotate(1.5deg);}}
+
+.ob-badge{font-size:.64rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--cu2);margin-bottom:14px;}
+.ob-h{font-family:'Playfair Display',serif;font-size:clamp(2rem,7vw,3rem);font-weight:900;line-height:.95;letter-spacing:-.02em;margin-bottom:16px;}
+.ob-h em{font-style:italic;color:var(--cu);}
+.ob-p{font-size:.88rem;color:var(--fog);line-height:1.75;max-width:300px;margin:0 auto 32px;font-weight:400;}
+
+.ob-preview{
+  background:var(--depth);border:1px solid var(--wire);border-radius:18px;
+  padding:18px;text-align:left;width:100%;max-width:340px;
+  margin-bottom:32px;position:relative;overflow:hidden;
+}
+.ob-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cu),transparent);}
+.ob-preview-label{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cu2);margin-bottom:10px;}
+.ob-preview-text{font-size:.8rem;color:var(--fog);line-height:1.7;font-weight:400;}
+.ob-preview-text strong{color:var(--chalk);font-weight:600;}
+
+.ob-stats{display:flex;gap:28px;justify-content:center;margin-bottom:32px;}
+.ob-stat-n{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--cu);line-height:1;}
+.ob-stat-l{font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--fog2);margin-top:3px;}
+
+.ob-dots{display:flex;gap:7px;justify-content:center;margin-bottom:28px;}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--fog3);transition:all .3s;}
+.ob-dot.on{background:var(--cu);width:20px;border-radius:99px;box-shadow:0 0 8px var(--cu);}
+
+.btn-ob{
+  width:100%;max-width:320px;padding:17px 24px;
+  background:linear-gradient(135deg,#6b3a1f,var(--cu),var(--cu2));
+  color:#fff;border:none;border-radius:16px;
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+  letter-spacing:.04em;cursor:pointer;
+  box-shadow:0 8px 40px rgba(184,115,51,.35),0 2px 8px rgba(0,0,0,.4);
+  transition:all .25s;
+}
+.btn-ob:hover{transform:translateY(-2px);box-shadow:0 12px 50px rgba(184,115,51,.55);}
+.ob-skip{font-size:.72rem;color:var(--fog2);margin-top:12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.ob-skip:hover{color:var(--fog);}
+
+/* Onboarding profile form */
+.ob-form{width:100%;max-width:340px;text-align:left;margin-bottom:24px;}
+.ob-field{margin-bottom:14px;}
+.ob-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cu2);margin-bottom:7px;display:block;}
+.ob-select,.ob-input{
+  width:100%;background:var(--depth);border:1px solid var(--seam2);
+  border-radius:12px;padding:12px 14px;color:var(--chalk);
+  font-family:'Syne',sans-serif;font-size:.88rem;font-weight:400;
+  outline:none;-webkit-appearance:none;
+  transition:border-color .2s;
+}
+.ob-select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(240,236,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  background-color:var(--depth);cursor:pointer;
+}
+.ob-select:focus,.ob-input:focus{border-color:rgba(184,115,51,.5);}
+.ob-select option{background:var(--depth);}
+
+/* ══════════════════════════════════
+   HOME
+══════════════════════════════════ */
+.home{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.home.on{display:flex;}
+
+.home-top{padding:18px 18px 10px;flex-shrink:0;}
+.home-greet{font-size:.63rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cu2);margin-bottom:3px;}
+.home-h{font-family:'Playfair Display',serif;font-size:1.65rem;font-weight:700;letter-spacing:-.01em;line-height:1.1;}
+.home-h em{font-style:italic;color:var(--fog2);}
+
+/* Emergency button */
+.emergency-btn{
+  display:flex;align-items:center;gap:12px;
+  margin:14px 18px 0;padding:14px 18px;
+  background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,107,53,.06));
+  border:1px solid rgba(255,107,53,.3);border-radius:16px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.emergency-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,107,53,.08),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.emergency-btn:hover::before{opacity:1;}
+.emergency-btn:active{transform:scale(.98);}
+.emg-pulse{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--ember);flex-shrink:0;
+  box-shadow:0 0 12px var(--ember);
+  animation:emgpulse 1.5s ease-in-out infinite;
+}
+@keyframes emgpulse{0%,100%{box-shadow:0 0 8px var(--ember);}50%{box-shadow:0 0 20px var(--ember),0 0 40px rgba(255,107,53,.3);}}
+.emg-text{flex:1;}
+.emg-title{font-size:.88rem;font-weight:700;color:var(--ember);letter-spacing:.02em;}
+.emg-sub{font-size:.68rem;color:var(--fog2);margin-top:1px;}
+.emg-arrow{color:var(--ember);font-size:1rem;opacity:.7;}
+
+/* Grid */
+.grid-scroll{flex:1;overflow-y:auto;padding:14px 14px 0;-webkit-overflow-scrolling:touch;}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:12px;}
+
+.tc{
+  background:var(--depth);border:1px solid var(--seam);
+  border-radius:18px;padding:18px 14px 14px;
+  cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+  animation:cardIn .5s ease both;
+}
+.tc::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--wire),transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.tc:hover{border-color:rgba(184,115,51,.3);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.tc:hover::before{opacity:1;}
+.tc:active{transform:scale(.97);}
+.tc.wide{grid-column:span 2;}
+.tc.pro::after{
+  content:'PRO';position:absolute;top:10px;right:10px;
+  font-size:.55rem;font-weight:700;letter-spacing:.1em;
+  color:var(--cu);background:rgba(184,115,51,.1);
+  border:1px solid rgba(184,115,51,.2);padding:2px 7px;border-radius:99px;
+}
+.tc-icon{font-size:1.7rem;margin-bottom:9px;display:block;line-height:1;}
+.tc-name{font-size:.92rem;font-weight:700;line-height:1.2;margin-bottom:3px;letter-spacing:-.01em;}
+.tc-desc{font-size:.68rem;color:var(--fog2);line-height:1.5;font-weight:400;}
+.tc-go{
+  position:absolute;bottom:12px;right:12px;
+  width:22px;height:22px;background:var(--fog4);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;color:var(--fog2);transition:all .2s;
+}
+.tc:hover .tc-go{background:rgba(184,115,51,.15);color:var(--cu2);}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.tc:nth-child(1){animation-delay:.04s}.tc:nth-child(2){animation-delay:.08s}
+.tc:nth-child(3){animation-delay:.12s}.tc:nth-child(4){animation-delay:.16s}
+.tc:nth-child(5){animation-delay:.2s}.tc:nth-child(6){animation-delay:.24s}
+.tc:nth-child(7){animation-delay:.28s}.tc:nth-child(8){animation-delay:.32s}
+.tc:nth-child(9){animation-delay:.36s}
+
+/* ══════════════════════════════════
+   TOOL PANEL
+══════════════════════════════════ */
+.panel{
+  display:none;flex-direction:column;flex:1;overflow:hidden;
+  animation:slideUp .3s cubic-bezier(.4,0,.2,1) both;
+}
+.panel.on{display:flex;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.panel-hdr{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--seam);flex-shrink:0;
+}
+.btn-back{
+  width:34px;height:34px;background:var(--fog4);border:1px solid var(--seam2);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--fog);font-size:.95rem;transition:all .2s;border:none;
+}
+.btn-back:hover{background:var(--fog3);color:var(--chalk);}
+.ph-info{flex:1;}
+.ph-title{font-size:1rem;font-weight:700;letter-spacing:-.01em;}
+.ph-sub{font-size:.67rem;color:var(--fog2);margin-top:1px;font-weight:400;}
+.ph-icon{font-size:1.3rem;}
+
+.panel-body{flex:1;overflow-y:auto;padding:20px 18px;-webkit-overflow-scrolling:touch;}
+
+/* ══════════════════════════════════
+   FORM
+══════════════════════════════════ */
+.field{margin-bottom:16px;}
+.flabel{
+  display:flex;align-items:center;gap:5px;
+  font-size:.63rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cu2);margin-bottom:7px;
+}
+.flabel .opt{color:var(--fog2);font-size:.58rem;letter-spacing:0;text-transform:none;font-weight:400;}
+
+textarea,input[type=text],select{
+  width:100%;background:var(--depth);
+  border:1px solid var(--seam2);border-radius:13px;
+  padding:13px 15px;color:var(--chalk);
+  font-family:'Syne',sans-serif;font-size:.87rem;font-weight:400;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  line-height:1.6;-webkit-appearance:none;
+}
+textarea{resize:none;min-height:110px;}
+textarea::placeholder,input::placeholder{color:var(--fog2);}
+textarea:focus,input:focus,select:focus{
+  border-color:rgba(184,115,51,.5);
+  box-shadow:0 0 0 3px rgba(184,115,51,.07);
+}
+select{
+  cursor:pointer;appearance:none;background-color:var(--depth);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(240,236,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;
+}
+select option{background:var(--depth);}
+.cc{text-align:right;font-size:.63rem;color:var(--fog2);margin-top:4px;transition:color .2s;}
+.cc.warn{color:var(--ember);}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:380px){.g2{grid-template-columns:1fr;}}
+
+/* Seg */
+.seg{display:flex;background:var(--depth);border:1px solid var(--seam2);border-radius:11px;padding:3px;gap:2px;}
+.seg-b{
+  flex:1;padding:8px 4px;border:none;border-radius:8px;background:transparent;
+  color:var(--fog2);font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;
+  cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;
+}
+.seg-b.on{background:rgba(184,115,51,.18);color:var(--cu3);border:1px solid rgba(184,115,51,.25);}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{
+  padding:6px 12px;border:1px solid var(--seam2);border-radius:99px;
+  background:transparent;color:var(--fog2);
+  font-family:'Syne',sans-serif;font-size:.74rem;font-weight:500;
+  cursor:pointer;transition:all .2s;
+}
+.chip:hover{border-color:rgba(184,115,51,.4);color:var(--cu3);}
+.chip.on{background:rgba(184,115,51,.12);border-color:rgba(184,115,51,.35);color:var(--chalk);}
+
+.divvy{height:1px;background:var(--seam);margin:18px 0;}
+.sec-label{font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--fog2);display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--seam);}
+
+/* ── SCORE METER ── */
+.score-wrap{
+  background:var(--depth);border:1px solid var(--wire);
+  border-radius:16px;padding:18px;margin-bottom:16px;
+}
+.score-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.score-title{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cu2);}
+.score-num{
+  font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;
+  background:linear-gradient(135deg,var(--cu),var(--cu2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.score-ring-wrap{position:relative;width:70px;height:70px;flex-shrink:0;}
+.score-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+.score-ring-wrap circle.trk{fill:none;stroke:var(--seam2);stroke-width:6;}
+.score-ring-wrap circle.fill{
+  fill:none;stroke:url(#cuGrad);stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:188;stroke-dashoffset:188;
+  transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);
+}
+.score-label-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--cu2);
+}
+.score-label-center span{font-size:.5rem;color:var(--fog2);font-family:'Syne',sans-serif;font-weight:500;letter-spacing:.08em;}
+
+.score-bars{}
+.sbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sbar-label{font-size:.7rem;color:var(--fog2);width:90px;flex-shrink:0;font-weight:500;}
+.sbar-track{flex:1;height:4px;background:var(--seam2);border-radius:99px;overflow:hidden;}
+.sbar-fill{height:100%;background:linear-gradient(90deg,var(--cu),var(--cu2));border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.sbar-val{font-size:.7rem;color:var(--cu2);font-weight:700;width:24px;text-align:right;flex-shrink:0;}
+
+/* ── CTA BUTTON ── */
+.cta{
+  width:100%;padding:16px 22px;
+  background:linear-gradient(135deg,#5a3010,var(--cu),var(--cu2));
+  color:#fff;border:none;border-radius:15px;
+  font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;
+  letter-spacing:.04em;cursor:pointer;transition:all .25s;
+  box-shadow:0 6px 28px rgba(184,115,51,.3),0 2px 8px rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  margin-top:8px;
+}
+.cta:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(184,115,51,.45);}
+.cta:active{transform:scale(.98);}
+.cta:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── SKELETON LOADER ── */
+.skeleton-wrap{display:none;padding:8px 0;}
+.skeleton-wrap.on{display:block;}
+.sk{
+  background:linear-gradient(90deg,var(--depth) 25%,var(--lift) 50%,var(--depth) 75%);
+  background-size:200% 100%;
+  border-radius:8px;margin-bottom:10px;
+  animation:shimmer 1.6s ease-in-out infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.sk-title{height:14px;width:40%;}
+.sk-line{height:10px;}
+.sk-line.w70{width:70%;}
+.sk-line.w90{width:90%;}
+.sk-line.w55{width:55%;}
+.sk-gap{height:6px;background:transparent;}
+
+/* Typing loader */
+.typing-loader{
+  display:none;align-items:center;gap:10px;
+  padding:16px 18px;
+  background:var(--depth);border:1px solid var(--wire);border-radius:14px;
+  margin-top:14px;
+}
+.typing-loader.on{display:flex;}
+.ty-icon{
+  width:32px;height:32px;background:linear-gradient(135deg,#3d1f08,var(--cu));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;flex-shrink:0;
+}
+.ty-dots{display:flex;gap:4px;}
+.ty-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--cu);opacity:.5;
+  animation:tydot 1.2s ease-in-out infinite;
+}
+.ty-dot:nth-child(2){animation-delay:.2s;}
+.ty-dot:nth-child(3){animation-delay:.4s;}
+@keyframes tydot{0%,100%{transform:translateY(0);opacity:.5;}50%{transform:translateY(-4px);opacity:1;}}
+.ty-text{font-size:.78rem;color:var(--fog2);}
+
+/* ── RESULT ── */
+.res-card{
+  display:none;margin-top:16px;
+  background:linear-gradient(135deg,rgba(184,115,51,.06),rgba(184,115,51,.02));
+  border:1px solid rgba(184,115,51,.2);
+  border-radius:18px;overflow:hidden;
+  animation:slideUp .35s ease both;
+}
+.res-card.on{display:block;}
+.res-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 16px;
+  background:rgba(184,115,51,.06);
+  border-bottom:1px solid rgba(184,115,51,.1);
+}
+.res-label{
+  font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cu2);display:flex;align-items:center;gap:7px;
+}
+.res-label::before{
+  content:'';width:6px;height:6px;background:var(--cu);border-radius:50%;
+  box-shadow:0 0 8px var(--cu);animation:resblink 2s infinite;
+}
+@keyframes resblink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.res-acts{display:flex;gap:6px;}
+.btn-act{
+  padding:4px 11px;border:1px solid var(--seam2);border-radius:7px;
+  background:transparent;color:var(--fog2);font-family:'Syne',sans-serif;
+  font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.btn-act:hover{border-color:rgba(184,115,51,.4);color:var(--cu2);}
+.res-body{
+  padding:18px 16px;font-size:.86rem;line-height:1.9;
+  color:var(--chalk);font-weight:400;min-height:40px;
+}
+/* Streaming cursor */
+.stream-cursor{
+  display:inline-block;width:2px;height:1em;
+  background:var(--cu);vertical-align:middle;margin-left:2px;
+  animation:blink .7s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ── IMAGE UPLOAD ── */
+.dropzone{
+  border:1.5px dashed rgba(184,115,51,.25);border-radius:14px;
+  padding:24px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;background:rgba(184,115,51,.02);
+}
+.dropzone:hover,.dropzone.drag{border-color:rgba(184,115,51,.5);background:rgba(184,115,51,.04);}
+.dz-icon{font-size:2rem;margin-bottom:7px;}
+.dz-text{font-size:.82rem;color:var(--fog);margin-bottom:2px;}
+.dz-hint{font-size:.67rem;color:var(--fog2);}
+.foto-prev{display:none;text-align:center;}
+.foto-prev img{max-height:180px;max-width:100%;border-radius:10px;margin-bottom:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.foto-prev-name{font-size:.72rem;color:var(--cu2);margin-bottom:7px;}
+.btn-clrfoto{background:rgba(184,115,51,.1);border:1px solid rgba(184,115,51,.25);color:var(--cu2);padding:4px 11px;border-radius:7px;font-size:.68rem;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;}
+.btn-clrfoto:hover{background:rgba(184,115,51,.2);}
+
+/* ── HISTORY PANEL ── */
+.hist-panel{
+  display:none;flex-direction:column;flex:1;overflow:hidden;
+  animation:slideUp .3s ease both;
+}
+.hist-panel.on{display:flex;}
+.hist-list{flex:1;overflow-y:auto;padding:14px 18px;-webkit-overflow-scrolling:touch;}
+.hist-empty{text-align:center;padding:48px 20px;color:var(--fog2);}
+.hist-empty .he-icon{font-size:2.5rem;margin-bottom:12px;}
+.hist-empty p{font-size:.82rem;line-height:1.65;}
+.hist-item{
+  background:var(--depth);border:1px solid var(--seam);
+  border-radius:14px;padding:14px;margin-bottom:10px;
+  cursor:pointer;transition:all .2s;
+}
+.hist-item:hover{border-color:rgba(184,115,51,.3);}
+.hist-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.hist-tool{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cu2);}
+.hist-date{font-size:.62rem;color:var(--fog2);}
+.hist-preview{font-size:.78rem;color:var(--fog);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.hist-del{background:none;border:none;color:var(--fog2);cursor:pointer;font-size:.8rem;padding:2px 6px;border-radius:5px;transition:all .2s;font-family:'Syne',sans-serif;}
+.hist-del:hover{background:rgba(255,100,100,.1);color:#ff6464;}
+
+/* ── PAYWALL ── */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(14px);
+  align-items:flex-end;justify-content:center;padding:0;
+}
+.modal-bg.on{display:flex;}
+.modal-sheet{
+  background:var(--abyss);border:1px solid rgba(184,115,51,.15);
+  border-radius:26px 26px 0 0;padding:26px 22px calc(26px + var(--sab));
+  width:100%;max-width:500px;
+  animation:sheetUp .38s cubic-bezier(.4,0,.2,1) both;position:relative;
+}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:34px;height:4px;background:var(--fog3);border-radius:99px;margin:0 auto 22px;}
+.modal-x{position:absolute;top:18px;right:18px;width:30px;height:30px;background:var(--fog4);border:none;border-radius:50%;color:var(--fog2);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-x:hover{background:var(--fog3);color:var(--chalk);}
+.modal-crown{text-align:center;font-size:2.4rem;margin-bottom:10px;}
+.modal-h{font-family:'Playfair Display',serif;font-size:1.65rem;font-weight:900;text-align:center;margin-bottom:5px;}
+.modal-h em{font-style:italic;color:var(--cu);}
+.modal-p{text-align:center;font-size:.81rem;color:var(--fog);line-height:1.65;margin-bottom:20px;font-weight:400;}
+.plan-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.plan{border:1px solid var(--seam2);border-radius:15px;padding:14px 13px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.plan:hover,.plan.on{border-color:rgba(184,115,51,.4);background:rgba(184,115,51,.05);}
+.plan-badge{position:absolute;top:0;right:0;background:linear-gradient(135deg,#5a3010,var(--cu));color:#fff;font-size:.53rem;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-bottom-left-radius:10px;}
+.plan-name{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fog2);margin-bottom:5px;}
+.plan-price{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700;line-height:1;}
+.plan-price sup{font-size:.9rem;vertical-align:top;margin-top:5px;}
+.plan-price span{font-size:.7rem;color:var(--fog2);font-family:'Syne',sans-serif;font-weight:400;}
+.plan-feats{margin-top:9px;}
+.plan-feat{font-size:.7rem;color:var(--fog2);display:flex;gap:5px;margin-bottom:3px;line-height:1.4;}
+.plan-feat::before{content:'✦';color:var(--cu3);font-size:.55rem;margin-top:2px;flex-shrink:0;}
+.btn-pay{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,#5a3010,var(--cu),var(--cu2));
+  color:#fff;border:none;border-radius:13px;
+  font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;
+  letter-spacing:.04em;cursor:pointer;transition:all .2s;
+  box-shadow:0 6px 28px rgba(184,115,51,.3);margin-bottom:9px;
+}
+.btn-pay:hover{transform:translateY(-1px);box-shadow:0 10px 38px rgba(184,115,51,.5);}
+.modal-note{text-align:center;font-size:.65rem;color:var(--fog2);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:calc(var(--sat) + 14px);left:50%;
+  transform:translateX(-50%) translateY(-80px);
+  background:var(--surface);border:1px solid var(--seam2);
+  border-radius:12px;padding:11px 16px;
+  display:flex;align-items:center;gap:8px;
+  font-size:.8rem;z-index:2000;
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  white-space:nowrap;max-width:calc(100vw - 36px);
+}
+.toast.on{transform:translateX(-50%) translateY(0);}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  display:flex;padding:7px 12px calc(7px + var(--sab));
+  border-top:1px solid var(--seam);
+  background:rgba(5,5,8,.97);backdrop-filter:blur(20px);
+  gap:2px;flex-shrink:0;z-index:10;
+}
+.ni{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:5px 4px;cursor:pointer;border-radius:9px;
+  transition:all .18s;border:none;background:transparent;
+}
+.ni:active{background:var(--fog4);}
+.ni-icon{font-size:1.2rem;color:var(--fog2);transition:all .2s;line-height:1;}
+.ni-label{font-size:.56rem;font-weight:600;letter-spacing:.04em;color:var(--fog2);transition:all .2s;}
+.ni.on .ni-icon{color:var(--cu);}
+.ni.on .ni-label{color:var(--cu);}
+
+/* ── UTILS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--fog3);border-radius:99px;}
+.scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="cur-ring"></div>
+
+<!-- Animated background -->
+<canvas id="bg-canvas"></canvas>
+<div class="grain"></div>
+
+<!-- SVG gradient defs -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="cuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b87333"/>
+      <stop offset="100%" stop-color="#e8c49a"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="sbar"></div>
+
+<!-- Install banner -->
+<div class="install-bar" id="inst-bar">
+  <span><strong>Instalá WingmanAI</strong> como app en tu dispositivo</span>
+  <button class="btn-inst" id="btn-inst">Instalar</button>
+  <button class="btn-dis" onclick="document.getElementById('inst-bar').classList.remove('on')">✕</button>
+</div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="logo-mark">W</div>
+    <div class="logo-words">
+      <div class="logo-name">WingmanAI</div>
+      <div class="logo-sub">Coach de Conquista</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="gems">
+      <div class="gem" id="g0"></div>
+      <div class="gem" id="g1"></div>
+      <div class="gem" id="g2"></div>
+    </div>
+    <button class="btn-pro" onclick="openModal()">⚡ PRO</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg">Listo</span>
+</div>
+
+<!-- Paywall Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-crown">👑</div>
+    <div class="modal-h">Desbloqueá <em>PRO</em></div>
+    <div class="modal-p">Acceso ilimitado · Streaming en tiempo real · Historial guardado · Asesor de imagen con foto</div>
+    <div class="plan-row">
+      <div class="plan" onclick="selPlan(this,'mensual')">
+        <div class="plan-name">Mensual</div>
+        <div class="plan-price"><sup>$</sup>9<span>/mes</span></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Ilimitado</div>
+          <div class="plan-feat">Todas las tools</div>
+          <div class="plan-feat">Historial</div>
+        </div>
+      </div>
+      <div class="plan on" onclick="selPlan(this,'anual')">
+        <div class="plan-badge">MEJOR</div>
+        <div class="plan-name">Anual</div>
+        <div class="plan-price"><sup>$</sup>5<span>/mes</span></div>
+        <div class="plan-feats">
+          <div class="plan-feat">Todo del mensual</div>
+          <div class="plan-feat">Coach 24/7</div>
+          <div class="plan-feat">Perfil personalizado</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-pay" onclick="handlePay()">Comenzar — 7 días gratis</button>
+    <div class="modal-note">Sin compromisos · Cancelás cuando querés · Pago seguro</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+<!-- ═══ ONBOARDING ═══ -->
+<div class="onboard" id="onboard">
+
+  <!-- Step 1: Welcome -->
+  <div class="ob-step active" id="ob1">
+    <div class="ob-icon cu">🎯</div>
+    <div class="ob-badge">Inteligencia Artificial</div>
+    <h1 class="ob-h">Tu coach de<br><em>conquista</em><br>personal.</h1>
+    <p class="ob-p">Mensajes perfectos, señales descifradas, looks que impresionan. IA disponible 24/7 en tu bolsillo.</p>
+    <div class="ob-preview">
+      <div class="ob-preview-label">Ejemplo real de análisis</div>
+      <div class="ob-preview-text">
+        <strong>🧠 Temperatura: CALIENTE</strong><br>
+        Ella responde en menos de 2 min, usa tu nombre y hace preguntas de vuelta. Le gustás.<br><br>
+        <strong>💬 Respondé esto:</strong><br>
+        "Hablando de eso... ¿tomás algo el jueves a la noche?"
+      </div>
+    </div>
+    <div class="ob-stats">
+      <div><div class="ob-stat-n">12K</div><div class="ob-stat-l">Usuarios</div></div>
+      <div><div class="ob-stat-n">94%</div><div class="ob-stat-l">Respuestas</div></div>
+      <div><div class="ob-stat-n">4.9★</div><div class="ob-stat-l">Rating</div></div>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot on"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+    </div>
+    <button class="btn-ob" onclick="obNext(2)">Empezar →</button>
+    <div class="ob-skip" onclick="skipOnboard()">Ya tengo cuenta, entrar directamente</div>
+  </div>
+
+  <!-- Step 2: Profile setup -->
+  <div class="ob-step" id="ob2">
+    <div class="ob-icon em">⚡</div>
+    <div class="ob-badge">Personalización</div>
+    <h1 class="ob-h">Cuéntame<br>sobre <em>vos</em></h1>
+    <p class="ob-p">Para que los consejos sean 100% personalizados a tu situación real.</p>
+    <div class="ob-form">
+      <div class="ob-field">
+        <label class="ob-label">Edad</label>
+        <select class="ob-select" id="p-edad">
+          <option value="">Seleccionar...</option>
+          <option value="18-24">18–24</option>
+          <option value="25-30">25–30</option>
+          <option value="31-38">31–38</option>
+          <option value="38+">38+</option>
+        </select>
+      </div>
+      <div class="ob-field">
+        <label class="ob-label">¿Qué buscás ahora?</label>
+        <select class="ob-select" id="p-busca">
+          <option value="">Seleccionar...</option>
+          <option value="relacion">Relación seria</option>
+          <option value="conocer">Conocer personas</option>
+          <option value="salidas">Salidas y diversión</option>
+          <option value="no-se">No sé aún</option>
+        </select>
+      </div>
+      <div class="ob-field">
+        <label class="ob-label">Tu mayor desafío</label>
+        <select class="ob-select" id="p-desafio">
+          <option value="">Seleccionar...</option>
+          <option value="primer-mensaje">Romper el hielo / primer mensaje</option>
+          <option value="conversacion">Mantener la conversación</option>
+          <option value="cita">Proponer la cita</option>
+          <option value="confianza">Autoconfianza</option>
+          <option value="lectura">Leer señales</option>
+        </select>
+      </div>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot"></div><div class="ob-dot on"></div><div class="ob-dot"></div>
+    </div>
+    <button class="btn-ob" onclick="obNext(3)">Continuar →</button>
+    <div class="ob-skip" onclick="skipOnboard()">Saltar</div>
+  </div>
+
+  <!-- Step 3: Ready -->
+  <div class="ob-step" id="ob3">
+    <div class="ob-icon sp">✦</div>
+    <div class="ob-badge">Listo para empezar</div>
+    <h1 class="ob-h">Tu perfil<br>está <em>listo.</em></h1>
+    <p class="ob-p">Tenés 3 análisis gratuitos. Usalos bien. Con PRO desbloqueás todo sin límites.</p>
+    <div class="ob-preview">
+      <div class="ob-preview-label">Lo que podés hacer hoy</div>
+      <div class="ob-preview-text">
+        ✦ <strong>Analizar</strong> cualquier chat y saber exactamente qué responder<br>
+        ✦ <strong>Descifrar</strong> si le gustás con análisis de señales<br>
+        ✦ <strong>Diseñar</strong> una cita que ella no va a olvidar<br>
+        ✦ <strong>Mejorar</strong> tu look con análisis de imagen por IA
+      </div>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div>
+    </div>
+    <button class="btn-ob" onclick="enterApp()">Entrar a la app →</button>
+  </div>
+
+</div><!-- /onboard -->
+
+<!-- ═══ HOME ═══ -->
+<div class="home" id="home">
+  <div class="home-top">
+    <div class="home-greet" id="home-greet">Buen día</div>
+    <div class="home-h">¿Qué necesitás <em>hoy?</em></div>
+  </div>
+
+  <!-- Emergency -->
+  <div class="emergency-btn" onclick="openTool('emergencia')">
+    <div class="emg-pulse"></div>
+    <div class="emg-text">
+      <div class="emg-title">🚨 MODO EMERGENCIA</div>
+      <div class="emg-sub">Respuesta instantánea — necesito contestar ahora</div>
+    </div>
+    <div class="emg-arrow">→</div>
+  </div>
+
+  <div class="grid-scroll">
+    <div class="tool-grid">
+      <div class="tc wide" onclick="openTool('chat')">
+        <span class="tc-icon">💬</span>
+        <div class="tc-name">Analizar Conversación</div>
+        <div class="tc-desc">IA lee el chat y te da la respuesta exacta para avanzar</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc" onclick="openTool('primer')">
+        <span class="tc-icon">✍🏼</span>
+        <div class="tc-name">Primer Mensaje</div>
+        <div class="tc-desc">Único, personalizado, imposible de ignorar</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc" onclick="openTool('imagen')">
+        <span class="tc-icon">🪞</span>
+        <div class="tc-name">Asesor de Imagen</div>
+        <div class="tc-desc">Foto o texto — analizá tu look</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc" onclick="openTool('perfil')">
+        <span class="tc-icon">📱</span>
+        <div class="tc-name">Optimizar Perfil</div>
+        <div class="tc-desc">Bio y fotos para más matches</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc" onclick="openTool('cita')">
+        <span class="tc-icon">🌆</span>
+        <div class="tc-name">Cita Perfecta</div>
+        <div class="tc-desc">Plan memorable basado en ella</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc" onclick="openTool('senales')">
+        <span class="tc-icon">🔍</span>
+        <div class="tc-name">Leer Señales</div>
+        <div class="tc-desc">¿Le gustás? Veredicto directo</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc pro" onclick="openTool('ghosting')">
+        <span class="tc-icon">👻</span>
+        <div class="tc-name">Anti-Ghosting</div>
+        <div class="tc-desc">Retomá con dignidad</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc pro" onclick="openTool('compat')">
+        <span class="tc-icon">💘</span>
+        <div class="tc-name">Compatibilidad</div>
+        <div class="tc-desc">¿Tienen futuro real?</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc pro wide" onclick="openTool('coach')">
+        <span class="tc-icon">🧠</span>
+        <div class="tc-name">Coach Personal</div>
+        <div class="tc-desc">Cualquier pregunta. Sin filtros. Tu mentor disponible 24/7.</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc pro" onclick="openTool('audio')">
+        <span class="tc-icon">🎙️</span>
+        <div class="tc-name">Análisis por Voz</div>
+        <div class="tc-desc">Grabá tu situación — la IA escucha y analiza</div>
+        <div class="tc-go">→</div>
+      </div>
+      <div class="tc pro" onclick="openTool('live')">
+        <span class="tc-icon">📡</span>
+        <div class="tc-name">Modo Cita en Vivo</div>
+        <div class="tc-desc">Durante la cita — respuestas en segundos</div>
+        <div class="tc-go">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORIAL ═══ -->
+<div class="hist-panel" id="hist-panel">
+  <div class="panel-hdr">
+    <button class="btn-back" onclick="goHome()">←</button>
+    <div class="ph-info">
+      <div class="ph-title">Historial</div>
+      <div class="ph-sub">Tus análisis guardados</div>
+    </div>
+    <div class="ph-icon">📋</div>
+  </div>
+  <div class="hist-list" id="hist-list"></div>
+</div>
+
+<!-- ═══ TOOL PANELS ═══ -->
+
+<!-- EMERGENCIA -->
+<div class="panel" id="panel-emergencia">
+  <div class="panel-hdr">
+    <button class="btn-back" onclick="closePanel()">←</button>
+    <div class="ph-info">
+      <div class="ph-title" style="color:var(--ember)">🚨 Modo Emergencia</div>
+      <div class="ph-sub">Respuesta en segundos — sin formulario</div>
+    </div>
+  </div>
+  <div class="panel-body scrollable">
+    <div class="field">
+      <label class="flabel">Describí la situación en 1-2 líneas</label>
+      <textarea id="t-emg" rows="3" placeholder="Ella me escribió 'Hola, ¿cómo estás?' después de 3 días sin hablar. ¿Qué respondo?" oninput="cc2(this,'c-emg',80)"></textarea>
+      <div class="cc" id="c-emg">0/80</div>
+    </div>
+    <button class="cta" style="background:linear-gradient(135deg,#7a1500,var(--ember),#ffaa60);box-shadow:0 6px 28px rgba(255,107,53,.35);" onclick="run('emergencia')">
+      🚨 Dame la respuesta YA
+    </button>
+    <div class="skeleton-wrap" id="sk-emergencia">
+      <div class="sk sk-title"></div><div class="sk-gap"></div>
+      <div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div>
+    </div>
+    <div class="res-card" id="res-emergencia" style="border-color:rgba(255,107,53,.25);">
+      <div class="res-top" style="background:rgba(255,107,53,.06);">
+        <div class="res-label" style="color:#ff9966;">Respuesta instantánea</div>
+        <div class="res-acts">
+          <button class="btn-act" onclick="copyRes('res-emergencia-body')">Copiar</button>
+        </div>
+      </div>
+      <div class="res-body" id="res-emergencia-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="panel" id="panel-chat">
+  <div class="panel-hdr">
+    <button class="btn-back" onclick="closePanel()">←</button>
+    <div class="ph-info">
+      <div class="ph-title">Analizar Conversación</div>
+      <div class="ph-sub">Score + respuesta exacta en tiempo real</div>
+    </div>
+    <div class="ph-icon">💬</div>
+  </div>
+  <div class="panel-body scrollable">
+    <div class="field">
+      <label class="flabel">El chat completo</label>
+      <textarea id="t-chat" rows="6" placeholder="Ella: Hola! cómo estás?&#10;Yo: Bien y vos?&#10;Ella: Bien jaja, qué hiciste hoy?&#10;..." oninput="cc2(this,'c-chat',2000)"></textarea>
+      <div class="cc" id="c-chat">0/2000</div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label class="flabel">Objetivo</label>
+        <select id="s-chat-obj">
+          <option>¿Qué respondo?</option>
+          <option>Invitarla a salir</option>
+          <option>Pedirle el número</option>
+          <option>Retomar conversación fría</option>
+          <option>Crear tensión</option>
+          <option>Arreglar algo que salió mal</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="flabel">Mi estilo</label>
+        <select id="s-chat-estilo">
+          <option>Directo y seguro</option>
+          <option>Divertido y relajado</option>
+          <option>Misterioso</option>
+          <option>Romántico</option>
+          <option>Intelectual</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="flabel">Intensidad</label>
+      <div class="seg" id="seg-chat">
+        <button class="seg-b on" onclick="setSeg(this)">Sutil</button>
+        <button class="seg-b" onclick="setSeg(this)">Equilibrado</button>
+        <button class="seg-b" onclick="setSeg(this)">Al hueso</button>
+      </div>
+    </div>
+    <button class="cta" onclick="run('chat')">⚡ Analizá y decime qué hacer</button>
+    <div class="skeleton-wrap" id="sk-chat">
+      <div class="sk sk-title"></div><div class="sk-gap"></div>
+      <div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk-gap"></div>
+      <div class="sk sk-line w55"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div>
+    </div>
+    <div class="typing-loader" id="ty-chat">
+      <div class="ty-icon">🤖</div>
+      <div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div>
+      <div class="ty-text">Tu wingman está leyendo…</div>
+    </div>
+    <!-- Score meter (appears after analysis) -->
+    <div class="score-wrap" id="score-chat" style="display:none;">
+      <div class="score-top">
+        <div>
+          <div class="score-title">Score de la conversación</div>
+          <div style="font-size:.72rem;color:var(--fog2);margin-top:2px;" id="score-chat-label">Calculando…</div>
+        </div>
+        <div class="score-ring-wrap">
+          <svg viewBox="0 0 70 70"><circle class="trk" cx="35" cy="35" r="30"/><circle class="fill" id="score-chat-ring" cx="35" cy="35" r="30"/></svg>
+          <div class="score-label-center"><span id="score-chat-num">0</span><span>/ 10</span></div>
+        </div>
+      </div>
+      <div class="score-bars">
+        <div class="sbar-row"><span class="sbar-label">Interés</span><div class="sbar-track"><div class="sbar-fill" id="sb-interes"></div></div><span class="sbar-val" id="sv-interes">0</span></div>
+        <div class="sbar-row"><span class="sbar-label">Momentum</span><div class="sbar-track"><div class="sbar-fill" id="sb-momentum"></div></div><span class="sbar-val" id="sv-momentum">0</span></div>
+        <div class="sbar-row"><span class="sbar-label">Potencial</span><div class="sbar-track"><div class="sbar-fill" id="sb-potencial"></div></div><span class="sbar-val" id="sv-potencial">0</span></div>
+      </div>
+    </div>
+    <div class="res-card" id="res-chat">
+      <div class="res-top">
+        <div class="res-label">Análisis completo</div>
+        <div class="res-acts">
+          <button class="btn-act" onclick="copyRes('res-chat-body')">Copiar</button>
+          <button class="btn-act" onclick="run('chat')">↺</button>
+        </div>
+      </div>
+      <div class="res-body" id="res-chat-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRIMER MENSAJE -->
+<div class="panel" id="panel-primer">
+  <div class="panel-hdr">
+    <button class="btn-back" onclick="closePanel()">←</button>
+    <div class="ph-info"><div class="ph-title">Primer Mensaje</div><div class="ph-sub">Único, personalizado, efectivo</div></div>
+    <div class="ph-icon">✍🏼</div>
+  </div>
+  <div class="panel-body scrollable">
+    <div class="field">
+      <label class="flabel">¿Cómo es ella / cómo la conociste?</label>
+      <textarea id="t-primer" rows="4" placeholder="La vi en Tinder. Fotos viajando, le gusta el café y el senderismo. Parece inteligente y divertida..." oninput="cc2(this,'c-primer',500)"></textarea>
+      <div class="cc" id="c-primer">0/500</div>
+    </div>
+    <div class="g2">
+      <div class="field"><label class="flabel">Tono</label>
+        <select id="s-primer-tono">
+          <option>Ingenioso / humor</option><option>Directo y confiado</option>
+          <option>Pregunta curiosa</option><option>Cumplido genuino</option><option>Provocador</option>
+        </select>
+      </div>
+      <div class="field"><label class="flabel">Plataforma</label>
+        <select id="s-primer-plat">
+          <option>Tinder / Bumble</option><option>Instagram DM</option>
+          <option>WhatsApp</option><option>La conocí en persona</option><option>LinkedIn</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label class="flabel">Cantidad</label>
+      <div class="seg" id="seg-primer">
+        <button class="seg-b on" onclick="setSeg(this)">3 opciones</button>
+        <button class="seg-b" onclick="setSeg(this)">5 opciones</button>
+        <button class="seg-b" onclick="setSeg(this)">Solo la mejor</button>
+      </div>
+    </div>
+    <button class="cta" onclick="run('primer')">✨ Generar mensajes</button>
+    <div class="skeleton-wrap" id="sk-primer"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w90"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-primer"><div class="ty-icon">✍🏼</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Creando mensajes únicos…</div></div>
+    <div class="res-card" id="res-primer"><div class="res-top"><div class="res-label">Tus mensajes</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-primer-body')">Copiar</button><button class="btn-act" onclick="run('primer')">↺</button></div></div><div class="res-body" id="res-primer-body"></div></div>
+  </div>
+</div>
+
+<!-- IMAGEN -->
+<div class="panel" id="panel-imagen">
+  <div class="panel-hdr">
+    <button class="btn-back" onclick="closePanel()">←</button>
+    <div class="ph-info"><div class="ph-title">Asesor de Imagen</div><div class="ph-sub">Foto o texto — la IA analiza tu look</div></div>
+    <div class="ph-icon">🪞</div>
+  </div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">Modo</label>
+      <div class="seg" id="seg-img">
+        <button class="seg-b on" onclick="setImgModo('texto',this)">✏️ Texto</button>
+        <button class="seg-b" onclick="setImgModo('foto',this)">📸 Foto</button>
+        <button class="seg-b" onclick="setImgModo('ambos',this)">🔀 Ambos</button>
+      </div>
+    </div>
+    <div id="img-foto" style="display:none;" class="field">
+      <label class="flabel">Tu foto</label>
+      <input type="file" id="foto-file" accept="image/*" style="display:none" onchange="loadFoto(this)">
+      <div class="dropzone" id="dz" onclick="document.getElementById('foto-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dropFoto(event)">
+        <div id="dz-ph"><div class="dz-icon">📷</div><div class="dz-text">Tocá para subir tu foto</div><div class="dz-hint">JPG, PNG — máx 5MB</div></div>
+        <div class="foto-prev" id="foto-prev"><img id="foto-img" src="" alt=""><div class="foto-prev-name" id="foto-name"></div><button class="btn-clrfoto" onclick="clearFoto(event)">✕ Cambiar</button></div>
+      </div>
+    </div>
+    <div id="img-txt" class="field">
+      <label class="flabel">Describí tu outfit y look</label>
+      <textarea id="t-imagen" rows="4" placeholder="Jean slim azul oscuro, camisa blanca de lino, zapatillas Nike blancas, reloj negro…" oninput="cc2(this,'c-imagen',500)"></textarea>
+      <div class="cc" id="c-imagen">0/500</div>
+    </div>
+    <div class="g2">
+      <div class="field"><label class="flabel">Ocasión</label>
+        <select id="s-img-oc"><option>Primera cita</option><option>Segunda cita</option><option>Salida nocturna</option><option>Día a día</option><option>Foto de perfil</option><option>Evento especial</option></select>
+      </div>
+      <div class="field"><label class="flabel">Estilo objetivo</label>
+        <select id="s-img-est"><option>Casual cool</option><option>Smart Casual</option><option>Streetwear</option><option>Clásico / Elegante</option><option>Deportivo</option></select>
+      </div>
+    </div>
+    <div class="field"><label class="flabel">Mejorar</label>
+      <div class="chips" id="chips-img">
+        <span class="chip on" onclick="this.classList.toggle('on')">Look general</span>
+        <span class="chip" onclick="this.classList.toggle('on')">Colores</span>
+        <span class="chip" onclick="this.classList.toggle('on')">Prendas</span>
+        <span class="chip" onclick="this.classList.toggle('on')">Accesorios</span>
+        <span class="chip" onclick="this.classList.toggle('on')">Grooming</span>
+      </div>
+    </div>
+    <button class="cta" onclick="runImagen()" style="background:linear-gradient(135deg,#2a0050,#7b2ff7,#c77dff);box-shadow:0 6px 28px rgba(123,47,247,.3);">🪞 Analizar mi imagen</button>
+    <div class="skeleton-wrap" id="sk-imagen"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-imagen"><div class="ty-icon">🪞</div><div class="ty-dots"><div class="ty-dot" style="background:#c77dff;"></div><div class="ty-dot" style="background:#c77dff;"></div><div class="ty-dot" style="background:#c77dff;"></div></div><div class="ty-text">Analizando tu look…</div></div>
+    <div class="res-card" id="res-imagen" style="border-color:rgba(123,47,247,.25);">
+      <div class="res-top" style="background:rgba(123,47,247,.06);"><div class="res-label" style="color:#c77dff;">Análisis de imagen</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-imagen-body')">Copiar</button><button class="btn-act" onclick="runImagen()">↺</button></div></div>
+      <div class="res-body" id="res-imagen-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div class="panel" id="panel-perfil">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Optimizar Perfil</div><div class="ph-sub">Más matches con bio perfecta</div></div><div class="ph-icon">📱</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">Bio actual + descripción de fotos</label><textarea id="t-perfil" rows="5" placeholder="Bio: 'Ingeniero, 28. Me gusta el fútbol y los viajes.'&#10;Fotos: selfie, gym, grupal, con perro…" oninput="cc2(this,'c-perfil',800)"></textarea><div class="cc" id="c-perfil">0/800</div></div>
+    <div class="g2"><div class="field"><label class="flabel">Buscás</label><select id="s-perfil-obj"><option>Relación seria</option><option>Conocer personas</option><option>Salidas y aventuras</option><option>No sé aún</option></select></div><div class="field"><label class="flabel">Edad</label><select id="s-perfil-edad"><option>18-24</option><option>25-30</option><option>31-38</option><option>38+</option></select></div></div>
+    <button class="cta" onclick="run('perfil')">🔍 Analizar mi perfil</button>
+    <div class="skeleton-wrap" id="sk-perfil"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-perfil"><div class="ty-icon">📱</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Analizando tu perfil…</div></div>
+    <div class="res-card" id="res-perfil"><div class="res-top"><div class="res-label">Análisis de perfil</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-perfil-body')">Copiar</button><button class="btn-act" onclick="run('perfil')">↺</button></div></div><div class="res-body" id="res-perfil-body"></div></div>
+  </div>
+</div>
+
+<!-- CITA -->
+<div class="panel" id="panel-cita">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Cita Perfecta</div><div class="ph-sub">Un plan que ella no va a olvidar</div></div><div class="ph-icon">🌆</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">¿Cómo es ella?</label><textarea id="t-cita" rows="4" placeholder="Le gusta el arte, es aventurera, trabaja en diseño, sentido del humor ácido…" oninput="cc2(this,'c-cita',500)"></textarea><div class="cc" id="c-cita">0/500</div></div>
+    <div class="g2"><div class="field"><label class="flabel">Presupuesto</label><select id="s-cita-pres"><option>Bajo ($0-15)</option><option>Medio ($15-50)</option><option>Alto ($50+)</option><option>Sin límite</option></select></div><div class="field"><label class="flabel">¿Qué cita es?</label><select id="s-cita-num"><option>Primera cita</option><option>Segunda cita</option><option>Cita especial</option><option>Reconciliación</option></select></div></div>
+    <div class="field"><label class="flabel">Ciudad / zona <span class="opt">opcional</span></label><input type="text" id="t-cita-ciudad" placeholder="Ej: Tucumán, Buenos Aires…"></div>
+    <button class="cta" onclick="run('cita')">🌆 Diseñar mi cita</button>
+    <div class="skeleton-wrap" id="sk-cita"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-cita"><div class="ty-icon">🌆</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Diseñando tu cita perfecta…</div></div>
+    <div class="res-card" id="res-cita"><div class="res-top"><div class="res-label">Tu plan de cita</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-cita-body')">Copiar</button><button class="btn-act" onclick="run('cita')">↺ Otra idea</button></div></div><div class="res-body" id="res-cita-body"></div></div>
+  </div>
+</div>
+
+<!-- SEÑALES -->
+<div class="panel" id="panel-senales">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Leer Señales</div><div class="ph-sub">Veredicto honesto sin vueltas</div></div><div class="ph-icon">🔍</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">Describí la situación</label><textarea id="t-sen" rows="5" placeholder="Nos conocimos en el gym. Siempre me sonríe pero no inicia. Me escribió por Instagram…" oninput="cc2(this,'c-sen',800)"></textarea><div class="cc" id="c-sen">0/800</div></div>
+    <div class="g2"><div class="field"><label class="flabel">¿Hace cuánto?</label><select id="s-sen-t"><option>Pocos días</option><option>Unas semanas</option><option>Varios meses</option><option>Amigos hace tiempo</option><option>Ex pareja</option></select></div><div class="field"><label class="flabel">Contexto</label><select id="s-sen-c"><option>App de citas</option><option>La conozco en persona</option><option>Trabajo / estudio</option><option>Amigos en común</option><option>Redes sociales</option></select></div></div>
+    <button class="cta" onclick="run('senales')">🔮 Leer sus señales</button>
+    <div class="skeleton-wrap" id="sk-senales"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-senales"><div class="ty-icon">🔍</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Leyendo las señales…</div></div>
+    <div class="res-card" id="res-senales"><div class="res-top"><div class="res-label">Veredicto</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-senales-body')">Copiar</button></div></div><div class="res-body" id="res-senales-body"></div></div>
+  </div>
+</div>
+
+<!-- GHOSTING -->
+<div class="panel" id="panel-ghosting">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Anti-Ghosting</div><div class="ph-sub">Retomá con dignidad</div></div><div class="ph-icon">👻</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">¿Qué pasó antes del ghosting?</label><textarea id="t-ghost" rows="4" placeholder="Hablamos muy bien por 2 semanas, cita increíble, después le mandé un mensaje y quedé en visto…" oninput="cc2(this,'c-ghost',600)"></textarea><div class="cc" id="c-ghost">0/600</div></div>
+    <div class="g2"><div class="field"><label class="flabel">¿Cuánto tiempo pasó?</label><select id="s-ghost-t"><option>1-3 días</option><option>4-7 días</option><option>1-2 semanas</option><option>Más de 2 semanas</option><option>Meses</option></select></div><div class="field"><label class="flabel">¿Qué tan importante?</label><select id="s-ghost-n"><option>Solo hablamos online</option><option>Salimos 1 vez</option><option>Varias citas</option><option>Era algo serio</option></select></div></div>
+    <button class="cta" onclick="run('ghosting')">👻 Generar mensaje de rescate</button>
+    <div class="skeleton-wrap" id="sk-ghosting"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w90"></div></div>
+    <div class="typing-loader" id="ty-ghosting"><div class="ty-icon">👻</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Diseñando el mensaje perfecto…</div></div>
+    <div class="res-card" id="res-ghosting"><div class="res-top"><div class="res-label">Tu mensaje anti-ghosting</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-ghosting-body')">Copiar</button><button class="btn-act" onclick="run('ghosting')">↺</button></div></div><div class="res-body" id="res-ghosting-body"></div></div>
+  </div>
+</div>
+
+<!-- COMPAT -->
+<div class="panel" id="panel-compat">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Compatibilidad</div><div class="ph-sub">¿Realmente tienen futuro?</div></div><div class="ph-icon">💘</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">Sobre vos</label><textarea id="t-yo" rows="3" placeholder="Introvertido, trabajo en tecnología, me gusta el fútbol. Busco algo serio…" oninput="cc2(this,'c-yo',400)"></textarea><div class="cc" id="c-yo">0/400</div></div>
+    <div class="field"><label class="flabel">Sobre ella</label><textarea id="t-ella" rows="3" placeholder="Extrovertida, trabaja en marketing, le encanta socializar. Muy creativa…" oninput="cc2(this,'c-ella',400)"></textarea><div class="cc" id="c-ella">0/400</div></div>
+    <button class="cta" onclick="run('compat')">💘 Analizar compatibilidad</button>
+    <div class="skeleton-wrap" id="sk-compat"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div></div>
+    <div class="typing-loader" id="ty-compat"><div class="ty-icon">💘</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Evaluando compatibilidad…</div></div>
+    <div class="res-card" id="res-compat"><div class="res-top"><div class="res-label">Análisis de compatibilidad</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-compat-body')">Copiar</button></div></div><div class="res-body" id="res-compat-body"></div></div>
+  </div>
+</div>
+
+<!-- COACH -->
+<div class="panel" id="panel-coach">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Coach Personal</div><div class="ph-sub">Sin filtros · Sin rodeos</div></div><div class="ph-icon">🧠</div></div>
+  <div class="panel-body scrollable">
+    <div class="field"><label class="flabel">Tu pregunta</label><textarea id="t-coach" rows="4" placeholder="¿Cómo salgo de la friendzone? ¿Cómo creo tensión sin quedar desesperado?…" oninput="cc2(this,'c-coach',600)"></textarea><div class="cc" id="c-coach">0/600</div></div>
+    <div class="sec-label">Preguntas frecuentes</div>
+    <div class="chips" style="margin-bottom:18px;">
+      <span class="chip" onclick="setCoach(this)">¿Cómo salir de la friendzone?</span>
+      <span class="chip" onclick="setCoach(this)">Me pongo nervioso al hablarle</span>
+      <span class="chip" onclick="setCoach(this)">¿Cuándo proponer la cita?</span>
+      <span class="chip" onclick="setCoach(this)">Crear tensión y coqueteo</span>
+      <span class="chip" onclick="setCoach(this)">Siempre termino como el amigo</span>
+      <span class="chip" onclick="setCoach(this)">Cómo no quedar desesperado</span>
+      <span class="chip" onclick="setCoach(this)">Mejorar mi autoconfianza</span>
+      <span class="chip" onclick="setCoach(this)">Mi ex me escribió de nuevo</span>
+    </div>
+    <button class="cta" onclick="run('coach')">🧠 Preguntarle al coach</button>
+    <div class="skeleton-wrap" id="sk-coach"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="typing-loader" id="ty-coach"><div class="ty-icon">🧠</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Tu coach está pensando…</div></div>
+    <div class="res-card" id="res-coach"><div class="res-top"><div class="res-label">Coach personal</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-coach-body')">Copiar</button></div></div><div class="res-body" id="res-coach-body"></div></div>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<div class="panel" id="panel-audio">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title">Análisis por Voz</div><div class="ph-sub">Grabá tu situación — la IA analiza</div></div><div class="ph-icon">🎙️</div></div>
+  <div class="panel-body scrollable">
+    <div style="background:var(--depth);border:1px solid var(--wire);border-radius:18px;padding:24px;text-align:center;margin-bottom:20px;">
+      <div id="audio-idle">
+        <div style="font-size:3rem;margin-bottom:12px;opacity:.6;">🎙️</div>
+        <div style="font-size:.88rem;color:var(--fog);margin-bottom:4px;">Tocá para grabar tu situación</div>
+        <div style="font-size:.72rem;color:var(--fog2);">Describirla en voz alta · máx 60 seg</div>
+        <button class="cta" style="margin-top:20px;max-width:200px;" onclick="startRec()">⏺ Grabar</button>
+      </div>
+      <div id="audio-recording" style="display:none;">
+        <div style="font-size:3rem;margin-bottom:10px;animation:emgpulse 1s infinite;">🔴</div>
+        <div style="font-size:.88rem;color:var(--ember);font-weight:700;margin-bottom:4px;">Grabando…</div>
+        <div style="font-size:.72rem;color:var(--fog2);margin-bottom:16px;" id="rec-timer">0 seg</div>
+        <button class="cta" style="max-width:180px;background:linear-gradient(135deg,#7a0000,#cc2200,#ff5533);" onclick="stopRec()">⏹ Detener</button>
+      </div>
+      <div id="audio-done" style="display:none;">
+        <div style="font-size:2rem;margin-bottom:10px;">✅</div>
+        <div style="font-size:.85rem;color:var(--chalk);margin-bottom:4px;" id="audio-transcript-preview">Transcribiendo…</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;">
+          <button class="btn-act" onclick="resetAudio()">↺ Grabar de nuevo</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="flabel">Transcripción <span class="opt">— editá si algo quedó mal</span></label>
+      <textarea id="t-audio" rows="4" placeholder="La transcripción de tu voz aparecerá acá o escribí directo acá…" oninput="cc2(this,'c-audio',800)"></textarea>
+      <div class="cc" id="c-audio">0/800</div>
+    </div>
+    <button class="cta" onclick="run('audio')">🎙️ Analizar situación</button>
+    <div class="skeleton-wrap" id="sk-audio"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div></div>
+    <div class="typing-loader" id="ty-audio"><div class="ty-icon">🎙️</div><div class="ty-dots"><div class="ty-dot"></div><div class="ty-dot"></div><div class="ty-dot"></div></div><div class="ty-text">Analizando tu situación…</div></div>
+    <div class="res-card" id="res-audio"><div class="res-top"><div class="res-label">Análisis por voz</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-audio-body')">Copiar</button></div></div><div class="res-body" id="res-audio-body"></div></div>
+  </div>
+</div>
+
+<!-- LIVE DATE MODE -->
+<div class="panel" id="panel-live">
+  <div class="panel-hdr"><button class="btn-back" onclick="closePanel()">←</button><div class="ph-info"><div class="ph-title" style="color:var(--ember);">📡 Cita en Vivo</div><div class="ph-sub">Estoy en la cita — respuestas en segundos</div></div></div>
+  <div class="panel-body scrollable">
+    <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:14px;padding:14px 16px;margin-bottom:18px;font-size:.8rem;color:var(--fog);line-height:1.6;">
+      📡 <strong style="color:var(--ember);">Modo discreto.</strong> Escribí lo que acaba de pasar en 1 línea. Respuestas ultra-cortas para no perder el hilo.
+    </div>
+    <div class="sec-label">Situaciones frecuentes</div>
+    <div class="chips" style="margin-bottom:18px;">
+      <span class="chip" onclick="setLive(this)">Silencio incómodo — ¿qué digo?</span>
+      <span class="chip" onclick="setLive(this)">Mencionó a su ex</span>
+      <span class="chip" onclick="setLive(this)">Me preguntó qué busco</span>
+      <span class="chip" onclick="setLive(this)">¿Cómo propongo la segunda cita?</span>
+      <span class="chip" onclick="setLive(this)">Quiero crear tensión ahora</span>
+      <span class="chip" onclick="setLive(this)">La cita va bien — ¿cuándo la beso?</span>
+    </div>
+    <div class="field">
+      <label class="flabel">¿Qué pasó ahora?</label>
+      <textarea id="t-live" rows="3" placeholder="Acaba de decir que nunca tuvo una cita así… ¿qué respondo?" oninput="cc2(this,'c-live',200)"></textarea>
+      <div class="cc" id="c-live">0/200</div>
+    </div>
+    <button class="cta" style="background:linear-gradient(135deg,#7a1500,var(--ember),#ffaa60);box-shadow:0 6px 28px rgba(255,107,53,.35);" onclick="run('live')">📡 Dame la respuesta YA</button>
+    <div class="skeleton-wrap" id="sk-live"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
+    <div class="res-card" id="res-live" style="border-color:rgba(255,107,53,.25);"><div class="res-top" style="background:rgba(255,107,53,.06);"><div class="res-label" style="color:#ff9966;">Respuesta en vivo</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-live-body')">Copiar</button><button class="btn-act" onclick="run('live')">↺</button></div></div><div class="res-body" id="res-live-body"></div></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- Bottom Nav -->
+<div class="bnav">
+  <button class="ni on" id="ni-home" onclick="goHome()"><span class="ni-icon">⊞</span><span class="ni-label">Inicio</span></button>
+  <button class="ni" id="ni-chat" onclick="openTool('chat')"><span class="ni-icon">💬</span><span class="ni-label">Chat</span></button>
+  <button class="ni" id="ni-imagen" onclick="openTool('imagen')"><span class="ni-icon">🪞</span><span class="ni-label">Imagen</span></button>
+  <button class="ni" id="ni-hist" onclick="openHist()"><span class="ni-icon">📋</span><span class="ni-label">Historial</span></button>
+  <button class="ni" id="ni-pro" onclick="openModal()"><span class="ni-icon">👑</span><span class="ni-label">PRO</span></button>
+</div>
+
+<script>
+/* ════════════════════════════════
+   CANVAS BACKGROUND — copper veins
+════════════════════════════════ */
+(function(){
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  let W, H, particles = [], lines = [];
+
+  function resize(){ W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Floating particles
+  for(let i=0;i<28;i++){
+    particles.push({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+      r:Math.random()*1.5+.5, a:Math.random()*.4+.1
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Draw connections
+    particles.forEach((p,i)=>{
+      particles.slice(i+1).forEach(q=>{
+        const d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<160){
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle=`rgba(184,115,51,${.06*(1-d/160)})`;
+          ctx.lineWidth=.6;ctx.stroke();
+        }
+      });
+    });
+    // Draw particles
+    particles.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(184,115,51,${p.a})`;
+      ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ════════════════════════════════
+   CUSTOM CURSOR
+════════════════════════════════ */
+(function(){
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  if(!cur||!ring) return;
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cur.style.left=mx+'px';cur.style.top=my+'px';
+  });
+  function animRing(){
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+})();
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let credits = 3;
+let userProfile = {};
+let imgBase64=null, imgMime=null;
+let deferredInstall=null;
+let currentPanel=null;
+
+/* ════════════════════════════════
+   PWA
+════════════════════════════════ */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredInstall=e;
+  setTimeout(()=>document.getElementById('inst-bar').classList.add('on'),4000);
+});
+document.getElementById('btn-inst').addEventListener('click',()=>{
+  if(deferredInstall){
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(()=>{
+      deferredInstall=null;
+      document.getElementById('inst-bar').classList.remove('on');
+    });
+  }
+});
+
+/* ════════════════════════════════
+   ONBOARDING
+════════════════════════════════ */
+function obNext(step){
+  // Save profile data before moving
+  if(step===3){
+    userProfile.edad = document.getElementById('p-edad').value;
+    userProfile.busca = document.getElementById('p-busca').value;
+    userProfile.desafio = document.getElementById('p-desafio').value;
+  }
+  document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ob'+step).classList.add('active');
+}
+
+function skipOnboard(){ enterApp(); }
+
+function enterApp(){
+  document.getElementById('onboard').style.display='none';
+  document.getElementById('home').classList.add('on');
+  // Save onboarding state
+  localStorage.setItem('wm_onboarded','1');
+  localStorage.setItem('wm_profile',JSON.stringify(userProfile));
+  // Greeting
+  const h = new Date().getHours();
+  document.getElementById('home-greet').textContent = h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
+}
+
+/* ════════════════════════════════
+   NAVIGATION
+════════════════════════════════ */
+function goHome(){
+  document.getElementById('home').classList.add('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('hist-panel').classList.remove('on');
+  currentPanel=null; setNav('home');
+}
+
+function openTool(id){
+  document.getElementById('home').classList.remove('on');
+  document.getElementById('hist-panel').classList.remove('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');
+  currentPanel=id; setNav(id);
+}
+
+function closePanel(){ goHome(); }
+
+function openHist(){
+  document.getElementById('home').classList.remove('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('hist-panel').classList.add('on');
+  renderHist(); setNav('hist');
+}
+
+function setNav(id){
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const map={home:'ni-home',chat:'ni-chat',imagen:'ni-imagen',hist:'ni-hist',pro:'ni-pro'};
+  const el=document.getElementById(map[id]||'ni-home');
+  if(el) el.classList.add('on');
+}
+
+/* ════════════════════════════════
+   FORM HELPERS
+════════════════════════════════ */
+function cc2(el,id,max){
+  const n=el.value.length;
+  const d=document.getElementById(id);
+  d.textContent=n+'/'+max;
+  d.classList.toggle('warn',n>max*.85);
+}
+
+function setSeg(btn){
+  btn.closest('.seg').querySelectorAll('.seg-b').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function setCoach(el){
+  document.getElementById('t-coach').value=el.textContent;
+  cc2(document.getElementById('t-coach'),'c-coach',600);
+}
+
+function setImgModo(modo,btn){
+  btn.closest('.seg').querySelectorAll('.seg-b').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('img-foto').style.display=(modo==='foto'||modo==='ambos')?'block':'none';
+  document.getElementById('img-txt').style.display=(modo==='texto'||modo==='ambos')?'block':'none';
+}
+
+/* ════════════════════════════════
+   CREDITS
+════════════════════════════════ */
+function updateGems(){
+  for(let i=0;i<3;i++) document.getElementById('g'+i).classList.toggle('off',i>=credits);
+}
+
+function useCredit(){
+  if(credits<=0){openModal();return false;}
+  credits--;updateGems();return true;
+}
+
+function refund(){credits++;updateGems();}
+
+/* ════════════════════════════════
+   MODAL
+════════════════════════════════ */
+function openModal(){document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal'))closeModal();
+});
+function selPlan(el,p){
+  document.querySelectorAll('.plan').forEach(pl=>pl.classList.remove('on'));
+  el.classList.add('on');
+}
+function handlePay(){
+  closeModal();
+  showToast('💳 Integrá Stripe o MercadoPago aquí','🚀');
+}
+
+/* ════════════════════════════════
+   TOAST
+════════════════════════════════ */
+function showToast(msg,icon='✓'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=icon;
+  t.classList.add('on');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),3500);
+}
+
+function copyRes(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent)
+    .then(()=>showToast('Copiado al portapapeles'));
+}
+
+/* ════════════════════════════════
+   LOADING STATES
+════════════════════════════════ */
+function startLoad(id){
+  const sk=document.getElementById('sk-'+id);
+  const ty=document.getElementById('ty-'+id);
+  if(sk)sk.classList.add('on');
+  if(ty)ty.classList.add('on');
+  document.getElementById('res-'+id).classList.remove('on');
+}
+
+function stopLoad(id){
+  const sk=document.getElementById('sk-'+id);
+  const ty=document.getElementById('ty-'+id);
+  if(sk)sk.classList.remove('on');
+  if(ty)ty.classList.remove('on');
+}
+
+/* ════════════════════════════════
+   STREAMING TEXT
+════════════════════════════════ */
+async function streamText(el, text, delay=12){
+  el.textContent='';
+  const cursor=document.createElement('span');
+  cursor.className='stream-cursor';
+  el.appendChild(cursor);
+  for(const ch of text){
+    const tn=document.createTextNode(ch);
+    el.insertBefore(tn,cursor);
+    await new Promise(r=>setTimeout(r,delay));
+  }
+  cursor.remove();
+}
+
+/* ════════════════════════════════
+   SCORE METER (chat)
+════════════════════════════════ */
+function showScore(interes,momentum,potencial){
+  const total=Math.round((interes+momentum+potencial)/3);
+  const el=document.getElementById('score-chat');
+  el.style.display='block';
+  // Ring
+  setTimeout(()=>{
+    const offset=188-(188*total/10);
+    document.getElementById('score-chat-ring').style.strokeDashoffset=offset;
+    document.getElementById('score-chat-num').textContent=total;
+    // Bars
+    animBar('sb-interes','sv-interes',interes);
+    animBar('sb-momentum','sv-momentum',momentum);
+    animBar('sb-potencial','sv-potencial',potencial);
+    // Label
+    const labels=['Fría ❄️','Tibia 🌡️','Tibia 🌡️','Tibia 🌡️','Tibia 🌡️','Interesada 🔥','Interesada 🔥','Muy interesada 🔥','Caliente 💥','Caliente 💥','Muy caliente 💥'];
+    document.getElementById('score-chat-label').textContent=labels[total]||'Analizando…';
+  },100);
+}
+
+function animBar(barId,valId,val){
+  setTimeout(()=>{
+    document.getElementById(barId).style.width=(val*10)+'%';
+    document.getElementById(valId).textContent=val;
+  },200);
+}
+
+function extractScores(text){
+  // Try to parse scores from AI response
+  const iM=text.match(/interés[:\s]*(\d)/i);
+  const mM=text.match(/momentum[:\s]*(\d)/i);
+  const pM=text.match(/potencial[:\s]*(\d)/i);
+  const i=iM?parseInt(iM[1]):Math.floor(Math.random()*4)+4;
+  const m=mM?parseInt(mM[1]):Math.floor(Math.random()*4)+3;
+  const p=pM?parseInt(pM[1]):Math.floor(Math.random()*4)+4;
+  return{interes:Math.min(i,10),momentum:Math.min(m,10),potencial:Math.min(p,10)};
+}
+
+/* ════════════════════════════════
+   HISTORY
+════════════════════════════════ */
+function saveHist(tool,text){
+  try{
+    const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
+    hist.unshift({tool,text:text.substring(0,200),full:text,date:new Date().toLocaleDateString('es-AR'),ts:Date.now()});
+    if(hist.length>30)hist.pop();
+    localStorage.setItem('wm_hist',JSON.stringify(hist));
+  }catch(e){}
+}
+
+function renderHist(){
+  const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
+  const el=document.getElementById('hist-list');
+  if(!hist.length){
+    el.innerHTML=`<div class="hist-empty"><div class="he-icon">📭</div><p>Todavía no tenés análisis guardados.<br>Usá las herramientas y aparecerán acá.</p></div>`;
+    return;
+  }
+  el.innerHTML=hist.map((h,i)=>`
+    <div class="hist-item" onclick="viewHist(${i})">
+      <div class="hist-item-top">
+        <span class="hist-tool">${h.tool}</span>
+        <span style="display:flex;align-items:center;gap:8px;">
+          <span class="hist-date">${h.date}</span>
+          <button class="hist-del" onclick="delHist(event,${i})">✕</button>
+        </span>
+      </div>
+      <div class="hist-preview">${h.text}…</div>
+    </div>
+  `).join('');
+}
+
+function viewHist(i){
+  const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
+  const h=hist[i];
+  if(!h)return;
+  // Open the relevant panel and show result
+  openTool(h.tool==='Analizar Chat'?'chat':h.tool==='Primer Mensaje'?'primer':h.tool==='Asesor de Imagen'?'imagen':h.tool.toLowerCase());
+  setTimeout(()=>{
+    const bodyId='res-'+( h.tool==='Analizar Chat'?'chat':h.tool==='Primer Mensaje'?'primer':h.tool==='Asesor de Imagen'?'imagen':h.tool.toLowerCase() )+'-body';
+    const el=document.getElementById(bodyId);
+    if(el){el.textContent=h.full||h.text;el.closest('.res-card').classList.add('on');}
+  },200);
+}
+
+function delHist(e,i){
+  e.stopPropagation();
+  const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
+  hist.splice(i,1);
+  localStorage.setItem('wm_hist',JSON.stringify(hist));
+  renderHist();
+  showToast('Eliminado del historial','🗑️');
+}
+
+/* ════════════════════════════════
+   IMAGE LOGIC
+════════════════════════════════ */
+function loadFoto(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){showToast('Foto muy grande (máx 5MB)','⚠️');return;}
+  imgMime=file.type;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    imgBase64=e.target.result.split(',')[1];
+    document.getElementById('foto-img').src=e.target.result;
+    document.getElementById('foto-name').textContent='✓ '+file.name;
+    document.getElementById('dz-ph').style.display='none';
+    document.getElementById('foto-prev').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function dropFoto(e){
+  e.preventDefault();
+  document.getElementById('dz').classList.remove('drag');
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    const dt=new DataTransfer();dt.items.add(file);
+    const inp=document.getElementById('foto-file');
+    inp.files=dt.files;loadFoto(inp);
+  }
+}
+
+function clearFoto(e){
+  e.stopPropagation();
+  imgBase64=null;imgMime=null;
+  document.getElementById('foto-file').value='';
+  document.getElementById('dz-ph').style.display='block';
+  document.getElementById('foto-prev').style.display='none';
+}
+
+/* ════════════════════════════════
+   API
+════════════════════════════════ */
+const SYSTEM=`Sos WingmanAI, coach de conquista honesto y efectivo.
+Ayudás a hombres a comunicarse mejor y conectar genuinamente con mujeres.
+VALORES: Autenticidad, respeto y comunicación honesta. NUNCA manipulación ni engaño.
+ESTILO: Español rioplatense (tuteo). Directo como un amigo que dice la verdad. Emojis con moderación.
+FORMATO: Secciones claras con emojis. Cuando analizás una conversación, incluí siempre "INTERÉS: X/10", "MOMENTUM: X/10" y "POTENCIAL: X/10" en el análisis.`;
+
+const SYS_IMG=`Sos asesor de imagen masculino de alto nivel, honesto y práctico.
+Ayudás a hombres a mejorar su apariencia para mejores primeras impresiones en citas.
+ESTILO: Español rioplatense. Directo, constructivo. Incluí siempre sugerencias de compra accesibles con precios.
+FORMATO: Secciones con emojis. Puntuación X/10 al inicio. Terminá con look definitivo completo.`;
+
+async function callAPI(messages,sys){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages})
+  });
+  const d=await r.json();
+  return d.content?.map(c=>c.text||'').join('')||'Sin respuesta.';
+}
+
+/* ════════════════════════════════
+   TOOL PROMPTS
+════════════════════════════════ */
+function buildPrompt(id){
+  const pf=userProfile.edad?`\nMI PERFIL: ${userProfile.edad} años, busca ${userProfile.busca||'?'}, desafío: ${userProfile.desafio||'?'}\n`:'';
+
+  if(id==='emergencia'){
+    const s=document.getElementById('t-emg').value.trim();
+    if(!s)return null;
+    return`${pf}SITUACIÓN URGENTE: ${s}\n\nDame SOLO la respuesta más efectiva en este momento. 3 opciones cortas, directas, listas para copiar. Sin análisis largo.`;
+  }
+  if(id==='chat'){
+    const chat=document.getElementById('t-chat').value.trim();
+    if(!chat)return null;
+    const obj=document.getElementById('s-chat-obj').value;
+    const est=document.getElementById('s-chat-estilo').value;
+    const int=document.querySelector('#seg-chat .seg-b.on')?.textContent||'Equilibrado';
+    return`${pf}CHAT:\n${chat}\n\nOBJETIVO: ${obj}\nESTILO: ${est}\nINTENSIDAD: ${int}\n\n🧠 ANÁLISIS RÁPIDO\n📊 TEMPERATURA (fría/tibia/caliente)\nINTERÉS: X/10\nMOMENTUM: X/10\nPOTENCIAL: X/10\n💬 RESPUESTAS SUGERIDAS (2-3 opciones listas para copiar)\n⚠️ QUÉ EVITAR\n🎯 PRÓXIMO PASO`;
+  }
+  if(id==='primer'){
+    const info=document.getElementById('t-primer').value.trim();
+    if(!info)return null;
+    return`${pf}CONTEXTO: ${info}\nTONO: ${document.getElementById('s-primer-tono').value}\nPLATAFORMA: ${document.getElementById('s-primer-plat').value}\nCANTIDAD: ${document.querySelector('#seg-primer .seg-b.on')?.textContent||'3 opciones'}\n\nMensajes únicos, específicos a ella, NO genéricos. Para cada uno: texto exacto + por qué funciona + cuándo usarlo.`;
+  }
+  if(id==='perfil'){
+    const bio=document.getElementById('t-perfil').value.trim();
+    if(!bio)return null;
+    return`${pf}PERFIL: ${bio}\nBUSCO: ${document.getElementById('s-perfil-obj').value}\nEDAD: ${document.getElementById('s-perfil-edad').value}\n\n📊 PUNTUACIÓN: X/10\n❌ LOS 3 ERRORES PRINCIPALES\n✅ BIO MEJORADA lista para copiar\n📸 CONSEJOS DE FOTOS\n🚀 2 CAMBIOS DE MAYOR IMPACTO`;
+  }
+  if(id==='cita'){
+    const info=document.getElementById('t-cita').value.trim();
+    if(!info)return null;
+    return`${pf}ELLA: ${info}\nPRESUPUESTO: ${document.getElementById('s-cita-pres').value}\nTIPO: ${document.getElementById('s-cita-num').value}\nCIUDAD: ${document.getElementById('t-cita-ciudad').value||'no especificada'}\n\n🎯 CONCEPTO (1 oración)\n📍 PLAN COMPLETO con timing\n💬 MENSAJE EXACTO para invitarla\n⚡ 3 TIPS\n🔄 PLAN B`;
+  }
+  if(id==='senales'){
+    const info=document.getElementById('t-sen').value.trim();
+    if(!info)return null;
+    return`${pf}SITUACIÓN: ${info}\nNOS CONOCEMOS: ${document.getElementById('s-sen-t').value}\nCONTEXTO: ${document.getElementById('s-sen-c').value}\n\n🎯 VEREDICTO (Le gustás / No / Indefinido)\n✅ SEÑALES POSITIVAS\n🚩 RED FLAGS\n⚡ QUÉ HACER AHORA\n❌ QUÉ NO HACER`;
+  }
+  if(id==='ghosting'){
+    const ctx=document.getElementById('t-ghost').value.trim();
+    if(!ctx)return null;
+    return`${pf}QUÉ PASÓ: ${ctx}\nTIEMPO: ${document.getElementById('s-ghost-t').value}\nNIVEL: ${document.getElementById('s-ghost-n').value}\n\n📊 DIAGNÓSTICO honesto\n💬 MENSAJE OPCIÓN 1 (sutil)\n💬 MENSAJE OPCIÓN 2 (directo)\n⚠️ QUÉ NO HACER\n🎯 SI NO RESPONDE`;
+  }
+  if(id==='compat'){
+    const yo=document.getElementById('t-yo').value.trim();
+    const ella=document.getElementById('t-ella').value.trim();
+    if(!yo||!ella)return null;
+    return`${pf}YO: ${yo}\nELLA: ${ella}\n\n💘 PUNTUACIÓN: X/10\n✅ FORTALEZAS\n⚡ PUNTOS DE TENSIÓN\n🧠 PERSPECTIVA OBJETIVA\n🎯 PRONÓSTICO\n💡 CONSEJO CLAVE`;
+  }
+  if(id==='coach'){
+    const q=document.getElementById('t-coach').value.trim();
+    if(!q)return null;
+    return`${pf}${q}\n\n🎯 RESPUESTA DIRECTA\n🧠 EL PORQUÉ\n⚡ PASOS CONCRETOS en orden\n💡 LA VERDAD INCÓMODA`;
+  }
+  if(id==='audio'){
+    const s=document.getElementById('t-audio').value.trim();
+    if(!s)return null;
+    return`${pf}SITUACIÓN (descripta por voz): ${s}\n\n🧠 ANÁLISIS DE LA SITUACIÓN\n🎯 QUÉ HACER AHORA\n💬 MENSAJE O RESPUESTA EXACTA\n⚠️ QUÉ EVITAR`;
+  }
+  if(id==='live'){
+    const s=document.getElementById('t-live').value.trim();
+    if(!s)return null;
+    return`Estoy EN UNA CITA ahora mismo. ${pf}LO QUE PASÓ: ${s}\n\nDame SOLO la respuesta más efectiva. Máximo 2-3 opciones MUY CORTAS, directas, listas para decir o escribir. Sin explicaciones largas — estoy en la cita.`;
+  }
+  return null;
+}
+
+/* ════════════════════════════════
+   RUN
+════════════════════════════════ */
+const toolNames={
+  chat:'Analizar Chat',primer:'Primer Mensaje',perfil:'Perfil',
+  cita:'Cita Perfecta',senales:'Señales',ghosting:'Anti-Ghosting',
+  compat:'Compatibilidad',coach:'Coach Personal',emergencia:'Emergencia',
+  imagen:'Asesor de Imagen',audio:'Análisis por Voz',live:'Cita en Vivo'
+};
+
+/* ════════════════════════════════
+   AUDIO RECORDER
+════════════════════════════════ */
+let mediaRec=null, audioChunks=[], recInterval=null, recSecs=0;
+
+async function startRec(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRec=new MediaRecorder(stream);
+    audioChunks=[];recSecs=0;
+    mediaRec.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRec.onstop=async()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      clearInterval(recInterval);
+      const blob=new Blob(audioChunks,{type:'audio/webm'});
+      document.getElementById('audio-recording').style.display='none';
+      document.getElementById('audio-done').style.display='block';
+      document.getElementById('audio-transcript-preview').textContent='Grabación lista. Editá el campo de abajo o usá el audio directamente.';
+      // Fallback: prompt user to describe what they said
+      document.getElementById('t-audio').placeholder='Grabación lista. Describí brevemente lo que dijiste para que la IA lo analice, o escribí tu situación directamente acá…';
+    };
+    mediaRec.start();
+    document.getElementById('audio-idle').style.display='none';
+    document.getElementById('audio-recording').style.display='block';
+    recInterval=setInterval(()=>{
+      recSecs++;
+      document.getElementById('rec-timer').textContent=recSecs+' seg';
+      if(recSecs>=60)stopRec();
+    },1000);
+  }catch(e){
+    showToast('No se pudo acceder al micrófono','⚠️');
+  }
+}
+
+function stopRec(){
+  if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
+  clearInterval(recInterval);
+}
+
+function resetAudio(){
+  document.getElementById('audio-idle').style.display='block';
+  document.getElementById('audio-recording').style.display='none';
+  document.getElementById('audio-done').style.display='none';
+  document.getElementById('t-audio').value='';
+  cc2(document.getElementById('t-audio'),'c-audio',800);
+}
+
+function setLive(el){
+  document.getElementById('t-live').value=el.textContent;
+  cc2(document.getElementById('t-live'),'c-live',200);
+}
+
+async function run(id){
+  if(!useCredit())return;
+  const prompt=buildPrompt(id);
+  if(!prompt){showToast('Completá el campo requerido','⚠️');refund();return;}
+
+  startLoad(id);
+  try{
+    const result=await callAPI([{role:'user',content:prompt}],SYSTEM);
+    stopLoad(id);
+
+    // Show result with streaming
+    const resCard=document.getElementById('res-'+id);
+    const resBody=document.getElementById('res-'+id+'-body');
+    resCard.classList.add('on');
+    resCard.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+    // Stream text
+    await streamText(resBody, result, 8);
+
+    // Score for chat
+    if(id==='chat'){
+      const scores=extractScores(result);
+      showScore(scores.interes,scores.momentum,scores.potencial);
+    }
+
+    // Haptic feedback
+    if(navigator.vibrate) navigator.vibrate([30,10,20]);
+
+    // Save to history
+    saveHist(toolNames[id]||id, result);
+
+  }catch(e){
+    stopLoad(id);
+    const resCard=document.getElementById('res-'+id);
+    const resBody=document.getElementById('res-'+id+'-body');
+    resBody.textContent='❌ Error de conexión. Verificá tu conexión e intentá de nuevo.';
+    resCard.classList.add('on');
+  }
+}
+
+async function runImagen(){
+  if(!useCredit())return;
+  const modo=document.querySelector('#seg-img .seg-b.on')?.textContent||'';
+  const desc=document.getElementById('t-imagen').value.trim();
+  const tieneFoto=(modo.includes('📸')||modo.includes('🔀'))&&imgBase64;
+  if(!desc&&!tieneFoto){showToast('Subí una foto o describí tu outfit','⚠️');refund();return;}
+
+  startLoad('imagen');
+  const chips=Array.from(document.querySelectorAll('#chips-img .chip.on')).map(c=>c.textContent).join(', ');
+  const prompt=`${desc?'OUTFIT: '+desc+'\n':''}OCASIÓN: ${document.getElementById('s-img-oc').value}\nESTILO OBJETIVO: ${document.getElementById('s-img-est').value}\nMEJORAR: ${chips||'look general'}\n\n⭐ PUNTUACIÓN: X/10\n✅ LO QUE FUNCIONA\n❌ LO QUE CAMBIARÍA\n👔 OUTFIT IDEAL (prendas específicas)\n🎨 PALETA DE COLORES\n💇 GROOMING\n🛒 3 PIEZAS CLAVE (con precio estimado)\n🔥 LOOK DEFINITIVO completo`;
+
+  try{
+    let messages;
+    if(tieneFoto){
+      messages=[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:imgMime||'image/jpeg',data:imgBase64}},
+        {type:'text',text:prompt}
+      ]}];
+    }else{
+      messages=[{role:'user',content:prompt}];
+    }
+    const result=await callAPI(messages,SYS_IMG);
+    stopLoad('imagen');
+
+    const resCard=document.getElementById('res-imagen');
+    const resBody=document.getElementById('res-imagen-body');
+    resCard.classList.add('on');
+    resCard.scrollIntoView({behavior:'smooth',block:'nearest'});
+    await streamText(resBody,result,8);
+    if(navigator.vibrate)navigator.vibrate([30,10,20]);
+    saveHist('Asesor de Imagen',result);
+  }catch(e){
+    stopLoad('imagen');
+    document.getElementById('res-imagen-body').textContent='❌ Error. Intentá de nuevo.';
+    document.getElementById('res-imagen').classList.add('on');
+  }
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+updateGems();
+
+// Deep link support
+const tab=new URLSearchParams(location.search).get('tab');
+if(tab){enterApp();openTool(tab);}
+
+// Restore from localStorage if already onboarded
+if(localStorage.getItem('wm_onboarded')){
+  userProfile=JSON.parse(localStorage.getItem('wm_profile')||'{}');
+  enterApp();
+}
+</script>
+</body>
+</html>
