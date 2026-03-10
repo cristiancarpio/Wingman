@@ -50,6 +50,90 @@ body{
   position:relative;
 }
 
+/* ── DESKTOP LAYOUT ── */
+@media(min-width:680px){
+  body{
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(184,115,51,0.07) 0%, transparent 60%), var(--void);
+  }
+  .grain{opacity:.2;}
+
+  /* Phone shell */
+  .phone-shell{
+    width:420px;
+    height:min(860px, calc(100vh - 40px));
+    border-radius:44px;
+    border:1px solid rgba(184,115,51,0.2);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.8),
+      0 40px 120px rgba(0,0,0,.8),
+      0 0 80px rgba(184,115,51,.06),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    z-index:1;
+    background:var(--void);
+  }
+
+  /* Decorative side elements */
+  .phone-shell::before{
+    content:'';
+    position:absolute;
+    top:14px;left:50%;transform:translateX(-50%);
+    width:90px;height:5px;
+    background:rgba(255,255,255,.15);
+    border-radius:99px;
+    z-index:100;pointer-events:none;
+  }
+
+  /* Desktop sidebar */
+  .desktop-sidebar{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:24px;
+    padding-left:48px;
+    max-width:320px;
+    animation:fadeUp .6s ease both;
+  }
+
+  .ds-badge{font-size:.63rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--cu2);}
+  .ds-h{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;line-height:.95;letter-spacing:-.02em;margin-bottom:0;}
+  .ds-h em{font-style:italic;color:var(--cu);}
+  .ds-p{font-size:.85rem;color:var(--fog);line-height:1.75;font-weight:400;}
+  .ds-feats{display:flex;flex-direction:column;gap:10px;}
+  .ds-feat{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--fog);}
+  .ds-feat-icon{width:30px;height:30px;border-radius:8px;background:rgba(184,115,51,.1);border:1px solid rgba(184,115,51,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+  .ds-divider{height:1px;background:rgba(184,115,51,.12);}
+  .ds-stats{display:flex;gap:24px;}
+  .ds-stat-n{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--cu);line-height:1;}
+  .ds-stat-l{font-size:.6rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--fog2);margin-top:2px;}
+
+  /* Desktop wrapper */
+  .desktop-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    height:100%;
+    width:100%;
+  }
+
+  /* Move app body inside phone shell */
+  .sbar,.hdr,.install-bar,.app,.bnav{
+    max-width:100%;
+  }
+}
+
+@media(max-width:679px){
+  .phone-shell{display:contents;}
+  .desktop-sidebar{display:none;}
+  .desktop-wrap{display:contents;}
+}
+
 /* ── CUSTOM CURSOR (desktop) ── */
 @media(pointer:fine){
   body{cursor:none;}
@@ -652,6 +736,54 @@ select option{background:var(--depth);}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--fog3);border-radius:99px;}
 .scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* ── INSTALL FAB ── */
+.install-fab{
+  display:none;
+  position:fixed;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%) translateY(100px);
+  z-index:500;
+  background:linear-gradient(135deg,#3d1a06,var(--cu),var(--cu2));
+  color:#fff;
+  border:none;
+  border-radius:99px;
+  padding:14px 22px;
+  font-family:'Syne',sans-serif;
+  font-size:.82rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  cursor:pointer;
+  box-shadow:0 8px 40px rgba(184,115,51,.45), 0 2px 12px rgba(0,0,0,.4);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  white-space:nowrap;
+  align-items:center;
+  gap:9px;
+}
+.install-fab.show{
+  display:flex;
+  transform:translateX(-50%) translateY(0);
+}
+.install-fab:hover{
+  box-shadow:0 12px 50px rgba(184,115,51,.65), 0 4px 16px rgba(0,0,0,.5);
+  transform:translateX(-50%) translateY(-3px);
+}
+.install-fab:active{transform:translateX(-50%) scale(.97);}
+.fab-icon{font-size:1.1rem;}
+.fab-dismiss{
+  background:rgba(0,0,0,.2);border:none;border-radius:50%;
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.65rem;color:rgba(255,255,255,.7);
+  margin-left:4px;flex-shrink:0;
+  transition:background .2s;
+}
+.fab-dismiss:hover{background:rgba(0,0,0,.4);}
+
+/* Only show FAB on desktop */
+@media(max-width:679px){
+  .install-fab{bottom:calc(80px + var(--sab));}
+}
 </style>
 </head>
 <body>
@@ -673,6 +805,40 @@ select option{background:var(--depth);}
     </linearGradient>
   </defs>
 </svg>
+
+<!-- Install FAB (floating button) -->
+<button class="install-fab" id="install-fab" onclick="triggerInstall()">
+  <span class="fab-icon">📲</span>
+  <span>Descargala al escritorio</span>
+  <span class="fab-dismiss" onclick="dismissFab(event)">✕</span>
+</button>
+
+<!-- Desktop layout wrapper -->
+<div class="desktop-wrap">
+
+  <!-- Left sidebar — desktop only -->
+  <div class="desktop-sidebar" id="desktop-sidebar">
+    <div>
+      <div class="ds-badge">Inteligencia Artificial · Coach</div>
+      <h2 class="ds-h">Tu coach de<br><em>conquista</em><br>personal.</h2>
+    </div>
+    <p class="ds-p">Mensajes perfectos, señales descifradas, looks que impresionan. IA disponible en tu bolsillo.</p>
+    <div class="ds-feats">
+      <div class="ds-feat"><div class="ds-feat-icon">💬</div><span>Analizá cualquier conversación</span></div>
+      <div class="ds-feat"><div class="ds-feat-icon">🔍</div><span>Leé las señales con precisión</span></div>
+      <div class="ds-feat"><div class="ds-feat-icon">🪞</div><span>Asesor de imagen con IA</span></div>
+      <div class="ds-feat"><div class="ds-feat-icon">📡</div><span>Modo cita en vivo</span></div>
+    </div>
+    <div class="ds-divider"></div>
+    <div class="ds-stats">
+      <div><div class="ds-stat-n">12K</div><div class="ds-stat-l">Usuarios</div></div>
+      <div><div class="ds-stat-n">94%</div><div class="ds-stat-l">Respuestas</div></div>
+      <div><div class="ds-stat-n">4.9★</div><div class="ds-stat-l">Rating</div></div>
+    </div>
+  </div>
+
+  <!-- Phone shell -->
+  <div class="phone-shell">
 
 <div class="sbar"></div>
 
@@ -1331,6 +1497,9 @@ select option{background:var(--depth);}
   <button class="ni" id="ni-pro" onclick="openModal()"><span class="ni-icon">👑</span><span class="ni-label">PRO</span></button>
 </div>
 
+  </div><!-- /phone-shell -->
+</div><!-- /desktop-wrap -->
+
 <script>
 /* ════════════════════════════════
    CANVAS BACKGROUND — copper veins
@@ -1419,17 +1588,43 @@ if('serviceWorker' in navigator){
 }
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); deferredInstall=e;
-  setTimeout(()=>document.getElementById('inst-bar').classList.add('on'),4000);
+  // Show FAB after 3 seconds
+  setTimeout(()=>{
+    const fab = document.getElementById('install-fab');
+    fab.classList.add('show');
+  }, 3000);
+  // Also show inline banner on mobile
+  setTimeout(()=>document.getElementById('inst-bar').classList.add('on'), 8000);
 });
+
 document.getElementById('btn-inst').addEventListener('click',()=>{
   if(deferredInstall){
     deferredInstall.prompt();
     deferredInstall.userChoice.then(()=>{
       deferredInstall=null;
       document.getElementById('inst-bar').classList.remove('on');
+      document.getElementById('install-fab').classList.remove('show');
     });
   }
 });
+
+function triggerInstall(){
+  if(deferredInstall){
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(()=>{
+      deferredInstall=null;
+      document.getElementById('install-fab').classList.remove('show');
+    });
+  } else {
+    // iOS fallback
+    showToast('En iOS: Safari → Compartir → Agregar al inicio 📲','📱');
+  }
+}
+
+function dismissFab(e){
+  e.stopPropagation();
+  document.getElementById('install-fab').classList.remove('show');
+}
 
 /* ════════════════════════════════
    ONBOARDING
