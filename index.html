@@ -1,1525 +1,1056 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#050508">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WingmanAI">
-<meta name="description" content="Tu coach personal de conquista potenciado por IA">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>WingmanAI — Coach de Conquista</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0d0d0d"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="WingmanAI"/>
+<title>WingmanAI</title>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
 <style>
-/* ═══════════════════════════════════════════════
-   WINGMAN AI — OBSIDIAN COPPER · FINAL EDITION
-   Desktop: full web layout
-   Mobile:  native app feel
-═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --void:#050508; --abyss:#09090e; --depth:#0f0f18;
-  --surface:#161622; --lift:#1e1e2e; --lift2:#252535;
-  --cu:#b87333; --cu2:#d4956a; --cu3:#e8c49a;
-  --ember:#ff6b35;
-  --wire:rgba(184,115,51,.18); --wire2:rgba(184,115,51,.08);
-  --seam:rgba(255,255,255,.06); --seam2:rgba(255,255,255,.11);
-  --chalk:#f0ecff; --fog:rgba(240,236,255,.6);
-  --fog2:rgba(240,236,255,.35); --fog3:rgba(240,236,255,.14);
-  --fog4:rgba(240,236,255,.07);
-  --sab:env(safe-area-inset-bottom,0px);
-  --sat:env(safe-area-inset-top,0px);
-  --r:16px;
+  --bg:#0d0d0d;--bg2:#141414;--bg3:#1c1c1c;--bg4:#222222;
+  --red:#e63535;--red2:#ff5c5c;--amber:#f59e0b;--amber2:#fbbf24;
+  --white:#f0ede8;--gray:rgba(240,237,232,.55);--gray2:rgba(240,237,232,.28);--gray3:rgba(240,237,232,.1);
+  --border:rgba(240,237,232,.08);--border2:rgba(240,237,232,.14);
+  --font-display:'Barlow Condensed',sans-serif;
+  --font-body:'Barlow',sans-serif;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;}
-body{
-  background:var(--void);color:var(--chalk);
-  font-family:'Syne',sans-serif;font-size:15px;
-  overflow-x:hidden;
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:var(--font-body);overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px}
+
+/* INPUTS */
+textarea,input,select{
+  background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;
+  color:var(--white);font-family:var(--font-body);font-size:1.05rem;font-weight:400;
+  padding:15px 17px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none;line-height:1.5
 }
+textarea{resize:none;line-height:1.65}
+textarea:focus,input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(230,53,53,.1)}
+textarea::placeholder,input::placeholder{color:var(--gray2)}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(240,237,232,.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:40px;cursor:pointer
+}
+button{font-family:var(--font-body);cursor:pointer;border:none;background:none}
+button:disabled{opacity:.35;cursor:not-allowed}
 
-/* ── CANVAS BG ── */
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;}
-.grain{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  opacity:.3;}
+/* KEYFRAMES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(230,53,53,.6)}70%{box-shadow:0 0 0 12px rgba(230,53,53,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastSlide{from{opacity:0;transform:translateX(-50%) translateY(-16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* ══════════════════════════════════
-   DESKTOP LAYOUT (≥768px)
-══════════════════════════════════ */
-@media(min-width:768px){
-  body{display:flex;flex-direction:column;min-height:100%;overflow-y:auto;}
-
-  /* Top navigation bar */
-  .topbar{
-    position:sticky;top:0;z-index:100;
-    display:flex;align-items:center;
-    padding:0 40px;height:64px;
-    background:rgba(5,5,8,.95);backdrop-filter:blur(20px);
-    border-bottom:1px solid var(--seam);
-    gap:32px;flex-shrink:0;
-  }
-  .topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:16px;}
-  .topbar-mark{
-    width:36px;height:36px;border-radius:10px;flex-shrink:0;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu),var(--cu2));
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:#fff;
-    box-shadow:0 0 20px rgba(184,115,51,.3);
-  }
-  .topbar-name{font-size:1.05rem;font-weight:800;letter-spacing:.02em;}
-  .topbar-sub{font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cu2);margin-top:1px;}
-  .topbar-nav{display:flex;gap:4px;flex:1;}
-  .tnav-btn{
-    padding:8px 14px;border:none;background:transparent;
-    color:var(--fog2);font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;
-    border-radius:9px;cursor:pointer;transition:all .18s;white-space:nowrap;
-  }
-  .tnav-btn:hover{background:var(--fog4);color:var(--chalk);}
-  .tnav-btn.active{background:rgba(184,115,51,.12);color:var(--cu2);}
-  .topbar-right{display:flex;align-items:center;gap:10px;}
-  .topbar-install{
-    display:none;align-items:center;gap:7px;
-    padding:8px 16px;border-radius:99px;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu));
-    color:#fff;border:none;cursor:pointer;
-    font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;
-    letter-spacing:.05em;transition:all .2s;
-    box-shadow:0 4px 20px rgba(184,115,51,.3);
-  }
-  .topbar-install.show{display:flex;}
-  .topbar-install:hover{box-shadow:0 6px 28px rgba(184,115,51,.5);transform:translateY(-1px);}
-
-  /* Main layout */
-  .desktop-layout{
-    flex:1;display:flex;
-    max-width:1280px;margin:0 auto;width:100%;
-    padding:40px 40px 60px;gap:32px;
-  }
-
-  /* Sidebar */
-  .sidebar{
-    width:220px;flex-shrink:0;
-    position:sticky;top:104px;
-    height:fit-content;
-    display:flex;flex-direction:column;gap:4px;
-  }
-  .sb-section{font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--fog2);padding:10px 12px 5px;margin-top:8px;}
-  .sb-item{
-    display:flex;align-items:center;gap:10px;
-    padding:10px 14px;border-radius:11px;
-    border:none;background:transparent;
-    color:var(--fog);font-family:'Syne',sans-serif;
-    font-size:.88rem;font-weight:500;cursor:pointer;
-    transition:all .18s;text-align:left;width:100%;
-  }
-  .sb-item:hover{background:var(--fog4);color:var(--chalk);}
-  .sb-item.active{background:rgba(184,115,51,.12);color:var(--cu2);}
-  .sb-icon{font-size:1.1rem;width:20px;text-align:center;flex-shrink:0;}
-
-  /* Main content */
-  .main-content{flex:1;min-width:0;}
-
-  /* Page header */
-  .page-hdr{margin-bottom:32px;}
-  .page-badge{font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cu2);margin-bottom:8px;}
-  .page-h{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:10px;}
-  .page-h em{font-style:italic;color:var(--cu);}
-  .page-p{font-size:.95rem;color:var(--fog);line-height:1.7;max-width:600px;}
-
-  /* Tool grid on home */
-  .tool-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:16px;
-    margin-bottom:32px;
-  }
-  .tc{
-    background:var(--depth);border:1px solid var(--seam);
-    border-radius:18px;padding:22px 18px;
-    cursor:pointer;transition:all .22s;
-    position:relative;overflow:hidden;
-  }
-  .tc::before{content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(184,115,51,.08),transparent 60%);
-    opacity:0;transition:opacity .25s;}
-  .tc:hover{border-color:var(--wire);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.35);}
-  .tc:hover::before{opacity:1;}
-  .tc.wide{grid-column:span 2;}
-  .tc-icon{font-size:2rem;margin-bottom:12px;display:block;}
-  .tc-name{font-size:1.05rem;font-weight:700;margin-bottom:5px;letter-spacing:-.01em;}
-  .tc-desc{font-size:.83rem;color:var(--fog2);line-height:1.55;}
-  .tc-arrow{position:absolute;bottom:16px;right:16px;
-    width:26px;height:26px;background:var(--fog4);border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:.8rem;color:var(--fog2);transition:all .2s;}
-  .tc:hover .tc-arrow{background:rgba(184,115,51,.15);color:var(--cu2);}
-
-  /* Tool panel (desktop: shows inline in main content) */
-  .tool-panel{display:none;animation:fadeUp .3s ease both;}
-  .tool-panel.active{display:block;}
-  .tool-panel-inner{max-width:680px;}
-
-  /* Panel header */
-  .panel-hdr{
-    display:flex;align-items:center;gap:14px;
-    margin-bottom:28px;padding-bottom:20px;
-    border-bottom:1px solid var(--seam);
-  }
-  .btn-back{
-    width:38px;height:38px;background:var(--fog4);border:1px solid var(--seam2);
-    border-radius:10px;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--fog);font-size:1rem;transition:all .2s;
-    font-family:'Syne',sans-serif;
-  }
-  .btn-back:hover{background:var(--fog3);color:var(--chalk);}
-  .ph-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;}
-  .ph-sub{font-size:.82rem;color:var(--fog2);margin-top:2px;}
-  .ph-icon{font-size:1.6rem;margin-left:auto;}
-
-  /* Forms desktop */
-  .field{margin-bottom:20px;}
-  .flabel{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cu2);display:flex;align-items:center;gap:5px;margin-bottom:8px;}
-  .flabel .opt{color:var(--fog2);font-size:.62rem;letter-spacing:0;text-transform:none;font-weight:400;}
-  textarea,input[type=text],select{
-    width:100%;background:var(--depth);border:1px solid var(--seam2);
-    border-radius:13px;padding:14px 16px;color:var(--chalk);
-    font-family:'Syne',sans-serif;font-size:.96rem;font-weight:400;
-    outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.6;
-    -webkit-appearance:none;
-  }
-  textarea{resize:vertical;min-height:120px;}
-  textarea::placeholder,input::placeholder{color:var(--fog2);}
-  textarea:focus,input:focus,select:focus{
-    border-color:rgba(184,115,51,.5);
-    box-shadow:0 0 0 3px rgba(184,115,51,.07);
-  }
-  select{
-    cursor:pointer;appearance:none;background-color:var(--depth);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(240,236,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
-  }
-  select option{background:var(--depth);}
-  .cc{text-align:right;font-size:.68rem;color:var(--fog2);margin-top:5px;}
-  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .seg{display:flex;background:var(--depth);border:1px solid var(--seam2);border-radius:11px;padding:4px;gap:3px;}
-  .seg-b{flex:1;padding:9px 8px;border:none;border-radius:8px;background:transparent;
-    color:var(--fog2);font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;
-    cursor:pointer;transition:all .2s;text-align:center;}
-  .seg-b.on{background:rgba(184,115,51,.16);color:var(--cu3);border:1px solid rgba(184,115,51,.25);}
-  .chips{display:flex;flex-wrap:wrap;gap:7px;}
-  .chip{padding:7px 14px;border:1px solid var(--seam2);border-radius:99px;
-    background:transparent;color:var(--fog2);font-family:'Syne',sans-serif;
-    font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;}
-  .chip:hover{border-color:var(--wire);color:var(--cu3);}
-  .chip.on{background:rgba(184,115,51,.1);border-color:var(--wire);color:var(--chalk);}
-  .sec-label{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-    color:var(--fog2);display:flex;align-items:center;gap:8px;margin-bottom:11px;}
-  .sec-label::after{content:'';flex:1;height:1px;background:var(--seam);}
-  .cta{
-    width:100%;padding:17px 24px;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu),var(--cu2));
-    color:#fff;border:none;border-radius:14px;
-    font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;
-    letter-spacing:.04em;cursor:pointer;transition:all .25s;
-    box-shadow:0 6px 28px rgba(184,115,51,.28);
-    display:flex;align-items:center;justify-content:center;gap:9px;margin-top:8px;
-  }
-  .cta:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(184,115,51,.45);}
-  .cta:active{transform:scale(.98);}
-  .cta:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-
-  /* Result */
-  .res-card{display:none;margin-top:22px;
-    background:linear-gradient(135deg,rgba(184,115,51,.06),rgba(184,115,51,.02));
-    border:1px solid rgba(184,115,51,.2);border-radius:18px;overflow:hidden;
-    animation:fadeUp .35s ease both;}
-  .res-card.on{display:block;}
-  .res-top{display:flex;align-items:center;justify-content:space-between;
-    padding:13px 18px;background:rgba(184,115,51,.06);border-bottom:1px solid rgba(184,115,51,.1);}
-  .res-label{font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--cu2);display:flex;align-items:center;gap:7px;}
-  .res-label::before{content:'';width:6px;height:6px;background:var(--cu);border-radius:50%;
-    box-shadow:0 0 8px var(--cu);animation:resblink 2s infinite;}
-  @keyframes resblink{0%,100%{opacity:1;}50%{opacity:.3;}}
-  .res-acts{display:flex;gap:6px;}
-  .btn-act{padding:5px 12px;border:1px solid var(--seam2);border-radius:7px;
-    background:transparent;color:var(--fog2);font-family:'Syne',sans-serif;
-    font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;}
-  .btn-act:hover{border-color:var(--wire);color:var(--cu2);}
-  .res-body{padding:20px 18px;font-size:.95rem;line-height:2;color:var(--chalk);
-    font-weight:400;white-space:pre-wrap;min-height:40px;}
-  .stream-cursor{display:inline-block;width:2px;height:1em;background:var(--cu);
-    vertical-align:middle;margin-left:2px;animation:blink .7s step-end infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-  /* Skeleton */
-  .sk-wrap{display:none;padding:8px 0;}
-  .sk-wrap.on{display:block;}
-  .sk{background:linear-gradient(90deg,var(--depth) 25%,var(--lift) 50%,var(--depth) 75%);
-    background-size:200% 100%;border-radius:8px;margin-bottom:10px;
-    animation:shimmer 1.6s ease-in-out infinite;}
-  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-  .sk-title{height:14px;width:40%;}
-  .sk-line{height:10px;}
-  .sk-line.w90{width:90%}.sk-line.w70{width:70%}.sk-line.w55{width:55%}
-  .sk-gap{height:6px;background:transparent;}
-
-  /* Score */
-  .score-wrap{background:var(--depth);border:1px solid var(--wire);
-    border-radius:16px;padding:20px;margin-bottom:18px;}
-  .score-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-  .score-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cu2);}
-  .score-ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0;}
-  .score-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
-  .score-ring-wrap circle.trk{fill:none;stroke:var(--seam2);stroke-width:6;}
-  .score-ring-wrap circle.fill{fill:none;stroke:url(#cuGrad);stroke-width:6;stroke-linecap:round;
-    stroke-dasharray:188;stroke-dashoffset:188;
-    transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);}
-  .score-label-center{position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--cu2);}
-  .score-label-center span{font-size:.52rem;color:var(--fog2);font-family:'Syne',sans-serif;font-weight:500;}
-  .sbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
-  .sbar-label{font-size:.75rem;color:var(--fog2);width:90px;flex-shrink:0;}
-  .sbar-track{flex:1;height:5px;background:var(--seam2);border-radius:99px;overflow:hidden;}
-  .sbar-fill{height:100%;background:linear-gradient(90deg,var(--cu),var(--cu2));border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
-  .sbar-val{font-size:.72rem;color:var(--cu2);font-weight:700;width:24px;text-align:right;flex-shrink:0;}
-
-  /* Image upload */
-  .dropzone{border:1.5px dashed rgba(184,115,51,.25);border-radius:14px;
-    padding:28px;text-align:center;cursor:pointer;transition:all .2s;
-    background:rgba(184,115,51,.02);}
-  .dropzone:hover,.dropzone.drag{border-color:rgba(184,115,51,.5);background:rgba(184,115,51,.04);}
-  .dz-icon{font-size:2.2rem;margin-bottom:8px;}
-  .dz-text{font-size:.9rem;color:var(--fog);margin-bottom:3px;}
-  .dz-hint{font-size:.73rem;color:var(--fog2);}
-  .foto-prev{display:none;text-align:center;}
-  .foto-prev img{max-height:200px;max-width:100%;border-radius:12px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,.4);}
-  .foto-prev-name{font-size:.75rem;color:var(--cu2);margin-bottom:8px;}
-  .btn-clrfoto{background:rgba(184,115,51,.1);border:1px solid rgba(184,115,51,.25);color:var(--cu2);
-    padding:5px 13px;border-radius:8px;font-size:.72rem;cursor:pointer;font-family:'Syne',sans-serif;transition:all .2s;}
-
-  /* Historial desktop */
-  .hist-item{background:var(--depth);border:1px solid var(--seam);border-radius:14px;
-    padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;}
-  .hist-item:hover{border-color:var(--wire);}
-  .hist-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
-  .hist-tool{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cu2);}
-  .hist-date{font-size:.65rem;color:var(--fog2);}
-  .hist-preview{font-size:.85rem;color:var(--fog);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .hist-del{background:none;border:none;color:var(--fog2);cursor:pointer;font-size:.82rem;padding:2px 7px;border-radius:5px;transition:all .2s;font-family:'Syne',sans-serif;}
-  .hist-del:hover{background:rgba(255,80,80,.1);color:#ff6464;}
-  .hist-empty{text-align:center;padding:56px 20px;color:var(--fog2);}
-  .hist-empty .he-icon{font-size:2.8rem;margin-bottom:14px;}
-  .hist-empty p{font-size:.88rem;line-height:1.7;}
-
-  /* Emergency big */
-  .emergency-card{
-    background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,107,53,.03));
-    border:1px solid rgba(255,107,53,.25);border-radius:18px;padding:24px;
-    margin-bottom:28px;cursor:pointer;transition:all .2s;
-    display:flex;align-items:center;gap:18px;
-  }
-  .emergency-card:hover{border-color:rgba(255,107,53,.45);transform:translateY(-2px);}
-  .emg-pulse{width:12px;height:12px;border-radius:50%;background:var(--ember);flex-shrink:0;
-    box-shadow:0 0 12px var(--ember);animation:emgpulse 1.5s ease-in-out infinite;}
-  @keyframes emgpulse{0%,100%{box-shadow:0 0 8px var(--ember);}50%{box-shadow:0 0 24px var(--ember),0 0 48px rgba(255,107,53,.3);}}
-  .emg-text{flex:1;}
-  .emg-title{font-size:1rem;font-weight:700;color:var(--ember);margin-bottom:3px;}
-  .emg-sub{font-size:.82rem;color:var(--fog2);}
-
-  /* Toast */
-  .toast{position:fixed;top:80px;right:24px;
-    background:var(--surface);border:1px solid var(--seam2);border-radius:12px;
-    padding:12px 18px;display:flex;align-items:center;gap:8px;
-    font-size:.85rem;z-index:2000;
-    transform:translateY(-20px);opacity:0;
-    transition:all .32s cubic-bezier(.34,1.56,.64,1);
-    box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:none;}
-  .toast.on{transform:translateY(0);opacity:1;}
-
-  /* Mobile-only elements hidden on desktop */
-  .mobile-only,.sbar,.bnav{display:none!important;}
-  .topbar-install-ios{display:none;}
+/* ────────────────────────────────
+   HEADER
+──────────────────────────────── */
+#hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;border-bottom:1px solid var(--border);
+  background:rgba(13,13,13,.96);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);flex-shrink:0;position:relative;z-index:100
+}
+.logo-mark{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,#8b0000,var(--red));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:1.5rem;font-weight:900;
+  color:#fff;letter-spacing:.04em;box-shadow:0 2px 18px rgba(230,53,53,.4);flex-shrink:0
+}
+.logo-name{font-family:var(--font-display);font-size:1.6rem;font-weight:800;letter-spacing:.06em;line-height:1}
+.logo-sub{font-size:.65rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--red2);margin-top:1px}
+#btn-install-hdr{
+  padding:10px 20px;background:var(--red);color:#fff;border-radius:9px;
+  font-size:.88rem;font-weight:600;letter-spacing:.04em;display:none;
+  box-shadow:0 2px 14px rgba(230,53,53,.35)
 }
 
-/* ══════════════════════════════════
-   MOBILE LAYOUT (<768px)
-══════════════════════════════════ */
-@media(max-width:767px){
-  html{height:100%;overflow:hidden;}
-  body{height:100%;overflow:hidden;display:flex;flex-direction:column;}
+/* ────────────────────────────────
+   MAIN SCROLL AREA
+──────────────────────────────── */
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
 
-  /* Hide desktop-only elements */
-  .topbar,.desktop-only,.desktop-layout,.sidebar,.main-content,.page-hdr{display:none!important;}
-
-  /* Mobile header */
-  .mobile-hdr{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 18px 12px;padding-top:calc(14px + var(--sat));
-    border-bottom:1px solid var(--seam);flex-shrink:0;
-    background:rgba(5,5,8,.95);backdrop-filter:blur(20px);
-    position:relative;z-index:10;
-  }
-  .m-logo{display:flex;align-items:center;gap:9px;}
-  .m-logo-mark{width:34px;height:34px;border-radius:9px;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu),var(--cu2));
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff;
-    box-shadow:0 0 18px rgba(184,115,51,.3);flex-shrink:0;}
-  .m-logo-name{font-size:1rem;font-weight:800;letter-spacing:.01em;}
-  .m-logo-sub{font-size:.55rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--cu2);margin-top:1px;}
-
-  /* Install button mobile header */
-  .mobile-install-btn{
-    display:none;align-items:center;gap:6px;
-    padding:7px 13px;border-radius:99px;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu));
-    color:#fff;border:none;cursor:pointer;
-    font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;
-    letter-spacing:.05em;
-    box-shadow:0 3px 14px rgba(184,115,51,.3);
-  }
-  .mobile-install-btn.show{display:flex;}
-
-  /* App body */
-  .mobile-app{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
-
-  /* Home */
-  .mobile-home{display:none;flex-direction:column;flex:1;overflow:hidden;}
-  .mobile-home.on{display:flex;}
-  .m-home-top{padding:16px 18px 10px;flex-shrink:0;}
-  .m-greet{font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cu2);margin-bottom:3px;}
-  .m-title{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;letter-spacing:-.01em;line-height:1.1;}
-  .m-title em{font-style:italic;color:var(--fog2);}
-
-  /* Emergency mobile */
-  .m-emergency{
-    display:flex;align-items:center;gap:12px;
-    margin:12px 18px 0;padding:13px 16px;
-    background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);
-    border-radius:14px;cursor:pointer;transition:all .2s;
-  }
-  .m-emergency:active{transform:scale(.98);}
-  .emg-pulse{width:9px;height:9px;border-radius:50%;background:var(--ember);flex-shrink:0;
-    box-shadow:0 0 10px var(--ember);animation:emgpulse 1.5s ease-in-out infinite;}
-  @keyframes emgpulse{0%,100%{box-shadow:0 0 8px var(--ember);}50%{box-shadow:0 0 20px var(--ember);}}
-  .emg-title{font-size:.88rem;font-weight:700;color:var(--ember);}
-  .emg-sub{font-size:.68rem;color:var(--fog2);margin-top:1px;}
-
-  /* Mobile grid */
-  .m-grid-scroll{flex:1;overflow-y:auto;padding:14px 14px 0;-webkit-overflow-scrolling:touch;}
-  .m-tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:14px;}
-  .tc{background:var(--depth);border:1px solid var(--seam);border-radius:16px;
-    padding:16px 13px 14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-  .tc::before{content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(184,115,51,.07),transparent);opacity:0;transition:opacity .25s;}
-  .tc:active{transform:scale(.97);}
-  .tc:active::before{opacity:1;}
-  .tc.wide{grid-column:span 2;}
-  .tc-icon{font-size:1.65rem;margin-bottom:9px;display:block;}
-  .tc-name{font-size:.92rem;font-weight:700;line-height:1.2;margin-bottom:3px;}
-  .tc-desc{font-size:.7rem;color:var(--fog2);line-height:1.5;}
-  .tc-arrow{position:absolute;bottom:12px;right:12px;width:22px;height:22px;
-    background:var(--fog4);border-radius:50%;display:flex;align-items:center;
-    justify-content:center;font-size:.7rem;color:var(--fog2);}
-
-  /* Mobile panel */
-  .mobile-panel{display:none;flex-direction:column;flex:1;overflow:hidden;
-    animation:slideUp .3s cubic-bezier(.4,0,.2,1) both;}
-  .mobile-panel.on{display:flex;}
-  @keyframes slideUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
-  .panel-hdr{display:flex;align-items:center;gap:12px;
-    padding:14px 18px;border-bottom:1px solid var(--seam);flex-shrink:0;}
-  .btn-back{width:34px;height:34px;background:var(--fog4);border:1px solid var(--seam2);
-    border-radius:9px;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--fog);font-size:.9rem;transition:all .2s;border:none;}
-  .ph-title{font-size:1rem;font-weight:700;letter-spacing:-.01em;}
-  .ph-sub{font-size:.68rem;color:var(--fog2);margin-top:1px;}
-  .ph-icon{font-size:1.25rem;margin-left:auto;}
-  .panel-body{flex:1;overflow-y:auto;padding:18px 16px;-webkit-overflow-scrolling:touch;}
-
-  /* Mobile forms */
-  .field{margin-bottom:15px;}
-  .flabel{font-size:.65rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--cu2);display:flex;align-items:center;gap:5px;margin-bottom:7px;}
-  .flabel .opt{color:var(--fog2);font-size:.6rem;letter-spacing:0;text-transform:none;font-weight:400;}
-  textarea,input[type=text],select{
-    width:100%;background:var(--depth);border:1px solid var(--seam2);
-    border-radius:12px;padding:12px 14px;color:var(--chalk);
-    font-family:'Syne',sans-serif;font-size:.95rem;font-weight:400;
-    outline:none;transition:border-color .2s;line-height:1.6;-webkit-appearance:none;
-  }
-  textarea{resize:none;min-height:105px;}
-  textarea::placeholder,input::placeholder{color:var(--fog2);}
-  textarea:focus,input:focus,select:focus{border-color:rgba(184,115,51,.5);}
-  select{cursor:pointer;appearance:none;background-color:var(--depth);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(240,236,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;}
-  select option{background:var(--depth);}
-  .cc{text-align:right;font-size:.65rem;color:var(--fog2);margin-top:4px;}
-  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .seg{display:flex;background:var(--depth);border:1px solid var(--seam2);border-radius:10px;padding:3px;gap:2px;}
-  .seg-b{flex:1;padding:8px 4px;border:none;border-radius:7px;background:transparent;
-    color:var(--fog2);font-family:'Syne',sans-serif;font-size:.75rem;font-weight:600;
-    cursor:pointer;transition:all .2s;text-align:center;}
-  .seg-b.on{background:rgba(184,115,51,.16);color:var(--cu3);border:1px solid rgba(184,115,51,.25);}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;}
-  .chip{padding:6px 12px;border:1px solid var(--seam2);border-radius:99px;
-    background:transparent;color:var(--fog2);font-family:'Syne',sans-serif;
-    font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;}
-  .chip.on{background:rgba(184,115,51,.1);border-color:var(--wire);color:var(--chalk);}
-  .sec-label{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--fog2);display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-  .sec-label::after{content:'';flex:1;height:1px;background:var(--seam);}
-  .cta{width:100%;padding:15px 22px;
-    background:linear-gradient(135deg,#5a2d0a,var(--cu),var(--cu2));
-    color:#fff;border:none;border-radius:13px;
-    font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;
-    letter-spacing:.04em;cursor:pointer;transition:all .2s;
-    box-shadow:0 5px 24px rgba(184,115,51,.28);
-    display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
-  .cta:active{transform:scale(.98);}
-  .cta:disabled{opacity:.4;cursor:not-allowed;}
-
-  /* Mobile result */
-  .res-card{display:none;margin-top:14px;
-    background:linear-gradient(135deg,rgba(184,115,51,.06),rgba(184,115,51,.02));
-    border:1px solid rgba(184,115,51,.2);border-radius:16px;overflow:hidden;
-    animation:slideUp .35s ease both;}
-  .res-card.on{display:block;}
-  .res-top{display:flex;align-items:center;justify-content:space-between;
-    padding:12px 15px;background:rgba(184,115,51,.06);border-bottom:1px solid rgba(184,115,51,.1);}
-  .res-label{font-size:.63rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--cu2);display:flex;align-items:center;gap:7px;}
-  .res-label::before{content:'';width:6px;height:6px;background:var(--cu);border-radius:50%;
-    box-shadow:0 0 8px var(--cu);animation:resblink 2s infinite;}
-  @keyframes resblink{0%,100%{opacity:1;}50%{opacity:.3;}}
-  .res-acts{display:flex;gap:5px;}
-  .btn-act{padding:4px 10px;border:1px solid var(--seam2);border-radius:7px;
-    background:transparent;color:var(--fog2);font-family:'Syne',sans-serif;
-    font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;}
-  .btn-act:active{border-color:var(--wire);color:var(--cu2);}
-  .res-body{padding:16px 15px;font-size:.9rem;line-height:1.9;color:var(--chalk);
-    font-weight:400;white-space:pre-wrap;min-height:40px;}
-  .stream-cursor{display:inline-block;width:2px;height:1em;background:var(--cu);
-    vertical-align:middle;margin-left:2px;animation:blink .7s step-end infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-  /* Mobile skeleton */
-  .sk-wrap{display:none;padding:6px 0;}
-  .sk-wrap.on{display:block;}
-  .sk{background:linear-gradient(90deg,var(--depth) 25%,var(--lift) 50%,var(--depth) 75%);
-    background-size:200% 100%;border-radius:8px;margin-bottom:9px;
-    animation:shimmer 1.6s ease-in-out infinite;}
-  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-  .sk-title{height:12px;width:40%;}
-  .sk-line{height:9px;}
-  .sk-line.w90{width:90%}.sk-line.w70{width:70%}.sk-line.w55{width:55%}
-  .sk-gap{height:5px;background:transparent;}
-
-  /* Mobile score */
-  .score-wrap{background:var(--depth);border:1px solid var(--wire);
-    border-radius:14px;padding:16px;margin-bottom:14px;}
-  .score-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
-  .score-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cu2);}
-  .score-ring-wrap{position:relative;width:64px;height:64px;flex-shrink:0;}
-  .score-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
-  .score-ring-wrap circle.trk{fill:none;stroke:var(--seam2);stroke-width:6;}
-  .score-ring-wrap circle.fill{fill:none;stroke:url(#cuGrad);stroke-width:6;stroke-linecap:round;
-    stroke-dasharray:188;stroke-dashoffset:188;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);}
-  .score-label-center{position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--cu2);}
-  .score-label-center span{font-size:.5rem;color:var(--fog2);font-family:'Syne',sans-serif;}
-  .sbar-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
-  .sbar-label{font-size:.72rem;color:var(--fog2);width:82px;flex-shrink:0;}
-  .sbar-track{flex:1;height:4px;background:var(--seam2);border-radius:99px;overflow:hidden;}
-  .sbar-fill{height:100%;background:linear-gradient(90deg,var(--cu),var(--cu2));border-radius:99px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
-  .sbar-val{font-size:.7rem;color:var(--cu2);font-weight:700;width:20px;text-align:right;flex-shrink:0;}
-
-  /* Mobile image upload */
-  .dropzone{border:1.5px dashed rgba(184,115,51,.25);border-radius:13px;
-    padding:22px 14px;text-align:center;cursor:pointer;transition:all .2s;
-    background:rgba(184,115,51,.02);}
-  .dropzone:active,.dropzone.drag{border-color:rgba(184,115,51,.5);}
-  .dz-icon{font-size:1.9rem;margin-bottom:7px;}
-  .dz-text{font-size:.85rem;color:var(--fog);margin-bottom:2px;}
-  .dz-hint{font-size:.68rem;color:var(--fog2);}
-  .foto-prev{display:none;text-align:center;}
-  .foto-prev img{max-height:170px;max-width:100%;border-radius:10px;margin-bottom:8px;}
-  .foto-prev-name{font-size:.72rem;color:var(--cu2);margin-bottom:7px;}
-  .btn-clrfoto{background:rgba(184,115,51,.1);border:1px solid rgba(184,115,51,.25);color:var(--cu2);
-    padding:4px 11px;border-radius:7px;font-size:.68rem;cursor:pointer;font-family:'Syne',sans-serif;}
-
-  /* Mobile hist */
-  .hist-item{background:var(--depth);border:1px solid var(--seam);border-radius:13px;
-    padding:13px;margin-bottom:9px;cursor:pointer;transition:all .2s;}
-  .hist-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-  .hist-tool{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cu2);}
-  .hist-date{font-size:.62rem;color:var(--fog2);}
-  .hist-preview{font-size:.8rem;color:var(--fog);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .hist-del{background:none;border:none;color:var(--fog2);cursor:pointer;font-size:.8rem;padding:2px 6px;border-radius:5px;font-family:'Syne',sans-serif;}
-  .hist-empty{text-align:center;padding:44px 20px;color:var(--fog2);}
-  .hist-empty .he-icon{font-size:2.5rem;margin-bottom:12px;}
-  .hist-empty p{font-size:.82rem;line-height:1.65;}
-
-  /* Mobile toast */
-  .toast{position:fixed;top:calc(var(--sat) + 14px);left:50%;
-    transform:translateX(-50%) translateY(-80px);
-    background:var(--surface);border:1px solid var(--seam2);border-radius:12px;
-    padding:11px 16px;display:flex;align-items:center;gap:8px;
-    font-size:.82rem;z-index:2000;
-    transition:transform .32s cubic-bezier(.34,1.56,.64,1);
-    box-shadow:0 8px 30px rgba(0,0,0,.5);white-space:nowrap;max-width:calc(100vw - 32px);}
-  .toast.on{transform:translateX(-50%) translateY(0);}
-
-  /* Bottom nav */
-  .bnav{display:flex;padding:7px 12px calc(7px + var(--sab));
-    border-top:1px solid var(--seam);background:rgba(5,5,8,.97);
-    backdrop-filter:blur(20px);gap:2px;flex-shrink:0;z-index:10;}
-  .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-    padding:5px 4px;cursor:pointer;border-radius:9px;transition:all .18s;
-    border:none;background:transparent;}
-  .ni:active{background:var(--fog4);}
-  .ni-icon{font-size:1.2rem;color:var(--fog2);transition:all .2s;line-height:1;}
-  .ni-label{font-size:.56rem;font-weight:600;letter-spacing:.04em;color:var(--fog2);transition:all .2s;}
-  .ni.on .ni-icon,.ni.on .ni-label{color:var(--cu);}
-
-  /* Desktop-only hidden on mobile */
-  .topbar,.desktop-only,.sidebar{display:none!important;}
+/* ────────────────────────────────
+   HOME SCREEN
+──────────────────────────────── */
+#screen-home{flex:1;overflow-y:auto;padding-bottom:88px}
+.home-top{padding:28px 22px 18px;max-width:1040px;margin:0 auto}
+.home-greet{font-size:.75rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gray2);margin-bottom:6px}
+.home-h{
+  font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);
+  font-weight:900;line-height:.88;letter-spacing:.04em;margin-bottom:8px
 }
+.home-h em{font-style:normal;color:var(--red)}
+.home-sub{font-size:1.05rem;color:var(--gray);font-weight:400;line-height:1.5}
 
-/* Shared */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--fog3);border-radius:99px;}
+/* Emergency strip */
+.emg-strip{
+  display:flex;align-items:center;gap:16px;
+  margin:16px 22px 0;padding:18px 22px;
+  background:rgba(230,53,53,.08);border:1.5px solid rgba(230,53,53,.3);
+  border-radius:14px;cursor:pointer;transition:all .2s;
+  max-width:1040px;margin-left:auto;margin-right:auto;
+}
+.emg-strip:hover{background:rgba(230,53,53,.14);border-color:rgba(230,53,53,.55);transform:translateY(-1px)}
+.emg-dot{width:11px;height:11px;border-radius:50%;background:var(--red);animation:pulse 1.8s infinite;flex-shrink:0}
+.emg-text .t1{font-family:var(--font-display);font-size:1.2rem;font-weight:800;letter-spacing:.06em;color:var(--red2)}
+.emg-text .t2{font-size:.85rem;color:var(--gray2);margin-top:2px}
+.emg-arrow{color:var(--red);font-size:1.1rem;margin-left:auto}
+
+/* Tool grid */
+.tool-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:10px;padding:14px 22px 0;max-width:1040px;margin:0 auto
+}
+.tool-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:22px 20px 18px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden
+}
+.tool-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(230,53,53,.0),transparent);
+  transition:background .3s
+}
+.tool-card:hover{border-color:rgba(230,53,53,.35);background:var(--bg3);transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.tool-card:hover::before{background:linear-gradient(90deg,transparent,rgba(230,53,53,.6),transparent)}
+.tc-icon{font-size:2.1rem;margin-bottom:12px;display:block;line-height:1}
+.tc-name{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:.05em;margin-bottom:4px;line-height:1}
+.tc-desc{font-size:.9rem;color:var(--gray);line-height:1.5;font-weight:400}
+
+/* ────────────────────────────────
+   PANEL SCREEN
+──────────────────────────────── */
+#screen-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.panel-hdr{
+  display:flex;align-items:center;gap:14px;
+  padding:15px 22px;border-bottom:1px solid var(--border);
+  background:rgba(13,13,13,.95);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);flex-shrink:0;
+  position:sticky;top:0;z-index:50
+}
+.btn-back{
+  width:40px;height:40px;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gray);font-size:1.15rem;flex-shrink:0;cursor:pointer;transition:all .2s
+}
+.btn-back:hover{background:var(--bg4);color:var(--white)}
+.panel-title{font-family:var(--font-display);font-size:1.6rem;font-weight:800;letter-spacing:.06em}
+.panel-body{padding:26px 22px;max-width:700px;margin:0 auto;width:100%;padding-bottom:110px}
+
+/* ────────────────────────────────
+   FORM ELEMENTS
+──────────────────────────────── */
+.field{margin-bottom:22px}
+.field-label{
+  display:block;font-size:.75rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gray2);margin-bottom:9px
+}
+.field-label span{text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px;font-size:.72rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.seg-group{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:4px}
+.seg-btn{
+  flex:1;padding:11px 8px;border-radius:9px;
+  background:transparent;border:1px solid transparent;
+  color:var(--gray2);font-family:var(--font-body);font-size:.9rem;font-weight:600;
+  cursor:pointer;transition:all .2s;text-align:center
+}
+.seg-btn.on{background:rgba(230,53,53,.18);border-color:rgba(230,53,53,.4);color:var(--red2)}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  padding:9px 18px;border:1px solid var(--border2);border-radius:99px;
+  background:transparent;color:var(--gray);
+  font-family:var(--font-body);font-size:.9rem;font-weight:500;
+  cursor:pointer;transition:all .2s
+}
+.chip.on{border-color:rgba(230,53,53,.45);background:rgba(230,53,53,.1);color:var(--white)}
+.cta-btn{
+  width:100%;padding:19px 24px;
+  background:linear-gradient(135deg,#8b0000,var(--red));
+  color:#fff;border-radius:13px;
+  font-family:var(--font-display);font-size:1.45rem;font-weight:800;letter-spacing:.1em;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:10px;transition:all .25s;
+  box-shadow:0 6px 26px rgba(230,53,53,.35);cursor:pointer;border:none
+}
+.cta-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 32px rgba(230,53,53,.45)}
+.cta-btn.gold{background:linear-gradient(135deg,#b45309,var(--amber));box-shadow:0 6px 26px rgba(245,158,11,.3)}
+.cta-btn.gold:hover:not(:disabled){box-shadow:0 10px 32px rgba(245,158,11,.4)}
+.cta-btn.live{background:linear-gradient(135deg,#7c0a0a,#e63535,#f59e0b);box-shadow:0 6px 26px rgba(230,53,53,.4)}
+
+/* ────────────────────────────────
+   RESULT CARD
+──────────────────────────────── */
+.res-card{
+  margin-top:24px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:15px;
+  overflow:hidden;animation:fadeUp .35s ease both
+}
+.res-card.red-accent{border-color:rgba(230,53,53,.3)}
+.res-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 18px;border-bottom:1px solid var(--border);
+  background:rgba(230,53,53,.05)
+}
+.res-top.amber{background:rgba(245,158,11,.05);border-bottom-color:rgba(245,158,11,.15)}
+.res-label{font-family:var(--font-display);font-size:1.05rem;font-weight:700;letter-spacing:.1em;color:var(--red2)}
+.res-label.amber{color:var(--amber2)}
+.res-acts{display:flex;gap:7px}
+.btn-act{
+  padding:7px 15px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:8px;color:var(--gray);
+  font-family:var(--font-body);font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .2s
+}
+.btn-act:hover{background:var(--bg4);color:var(--white)}
+.res-body{
+  padding:22px 20px;font-size:1.02rem;line-height:1.9;
+  color:var(--white);white-space:pre-wrap;font-weight:400
+}
+.res-body strong{color:var(--amber2);font-weight:700}
+
+/* ────────────────────────────────
+   LOADER
+──────────────────────────────── */
+.loader-wrap{
+  display:flex;align-items:center;gap:14px;
+  padding:20px 18px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:14px;margin-top:20px
+}
+.spinner{
+  width:24px;height:24px;border:2px solid var(--border2);
+  border-top:2px solid var(--red);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0
+}
+.loader-txt{font-size:1rem;color:var(--gray);font-weight:400}
+
+/* ────────────────────────────────
+   SCORE METERS
+──────────────────────────────── */
+.score-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-bottom:20px;
+  animation:fadeUp .35s ease both
+}
+.score-bars{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.sbar-row{display:flex;align-items:center;gap:12px}
+.sbar-label{font-size:.85rem;color:var(--gray);width:90px;flex-shrink:0}
+.sbar-track{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.sbar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sbar-val{font-size:.85rem;font-weight:700;color:var(--amber2);width:22px;text-align:right}
+
+/* ────────────────────────────────
+   ONBOARDING
+──────────────────────────────── */
+#screen-onboard{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;padding:48px 26px 40px;
+  overflow-y:auto;background:var(--bg)
+}
+.ob-badge{
+  font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--red);margin-bottom:18px;
+  padding:7px 16px;border:1px solid rgba(230,53,53,.3);border-radius:99px;
+  background:rgba(230,53,53,.07)
+}
+.ob-h{
+  font-family:var(--font-display);font-size:clamp(3rem,10vw,5.5rem);
+  font-weight:900;line-height:.88;letter-spacing:.04em;
+  text-align:center;margin-bottom:16px
+}
+.ob-h em{font-style:normal;color:var(--red)}
+.ob-sub{font-size:1.05rem;color:var(--gray);text-align:center;max-width:320px;margin-bottom:32px;line-height:1.65;font-weight:400}
+.ob-example{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:22px 20px;width:100%;max-width:360px;margin-bottom:28px;
+  text-align:left;position:relative;overflow:hidden
+}
+.ob-example::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent)
+}
+.ob-ex-label{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.ob-ex-body{font-size:.95rem;color:var(--gray);line-height:1.75}
+.ob-ex-body strong{color:var(--white);font-weight:600}
+.ob-ex-body .highlight{color:var(--amber2);font-weight:600}
+.ob-stats{display:flex;gap:30px;margin-bottom:30px;justify-content:center}
+.ob-stat .n{font-family:var(--font-display);font-size:2.2rem;font-weight:900;color:var(--red);line-height:1}
+.ob-stat .l{font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gray2);margin-top:3px}
+.ob-dots{display:flex;gap:8px;margin-top:22px}
+.ob-dot{width:8px;height:8px;border-radius:99px;background:var(--bg4);transition:all .3s}
+.ob-dot.on{width:26px;background:var(--red)}
+.ob-form{width:100%;max-width:360px;text-align:left;margin-bottom:24px}
+.ob-skip{font-size:.88rem;color:var(--gray2);margin-top:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ────────────────────────────────
+   HISTORIAL
+──────────────────────────────── */
+.hist-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:border-color .2s
+}
+.hist-item:hover{border-color:var(--border2)}
+.hist-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hist-tool{font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:.08em;color:var(--red2)}
+.hist-date{font-size:.75rem;color:var(--gray2)}
+.hist-del{background:none;border:none;color:var(--gray2);cursor:pointer;font-size:.9rem;padding:2px 6px}
+.hist-preview{font-size:.9rem;color:var(--gray);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hist-empty{text-align:center;padding:60px 0;color:var(--gray2)}
+.hist-empty .icon{font-size:3rem;margin-bottom:14px}
+.hist-empty p{font-size:1rem}
+
+/* ────────────────────────────────
+   BOTTOM NAV
+──────────────────────────────── */
+#bnav{
+  position:relative;display:flex;
+  padding:10px 16px 16px;
+  border-top:1px solid var(--border);
+  background:rgba(13,13,13,.98);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  gap:4px;flex-shrink:0;
+  padding-bottom:max(16px, env(safe-area-inset-bottom))
+}
+.ni{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:4px;
+  padding:7px 4px;cursor:pointer;border-radius:11px;
+  background:transparent;color:var(--gray2);transition:all .2s
+}
+.ni.on{color:var(--red2)}
+.ni-icon{font-size:1.35rem;line-height:1}
+.ni-label{font-size:.63rem;font-weight:600;letter-spacing:.04em;color:inherit}
+
+/* ────────────────────────────────
+   TOAST
+──────────────────────────────── */
+#toast{
+  position:fixed;top:18px;left:50%;
+  transform:translateX(-50%) translateY(-20px);
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:11px;padding:13px 22px;
+  display:flex;align-items:center;gap:9px;
+  font-size:.92rem;z-index:3000;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  white-space:nowrap;pointer-events:none;opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1)
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:rgba(34,197,94,.3)}
+#toast.err{border-color:rgba(230,53,53,.4);color:var(--red2)}
+
+/* ────────────────────────────────
+   QUICK COACH PILLS
+──────────────────────────────── */
+.quick-label{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gray2);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.quick-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ────────────────────────────────
+   DESKTOP RESPONSIVE
+──────────────────────────────── */
+@media(min-width:680px){
+  .tool-grid{grid-template-columns:repeat(3,1fr)}
+  .panel-body{padding:30px 32px 120px}
+}
+@media(min-width:1080px){
+  .tool-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(prefers-color-scheme:dark){
+  /* already dark */
+}
 </style>
 </head>
 <body>
-
-<canvas id="bg-canvas"></canvas>
-<div class="grain"></div>
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <linearGradient id="cuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#b87333"/><stop offset="100%" stop-color="#e8c49a"/>
-    </linearGradient>
-  </defs>
-</svg>
-
-<!-- ═══ DESKTOP ═══ -->
-<div class="topbar desktop-only">
-  <a class="topbar-logo" href="#" onclick="showHome();return false;">
-    <div class="topbar-mark">W</div>
-    <div><div class="topbar-name">WingmanAI</div><div class="topbar-sub">Coach de Conquista</div></div>
-  </a>
-  <div class="topbar-nav">
-    <button class="tnav-btn active" id="tnav-home" onclick="showHome()">⊞ Inicio</button>
-    <button class="tnav-btn" id="tnav-chat" onclick="showTool('chat')">💬 Analizar Chat</button>
-    <button class="tnav-btn" id="tnav-primer" onclick="showTool('primer')">✍🏼 Primer Mensaje</button>
-    <button class="tnav-btn" id="tnav-imagen" onclick="showTool('imagen')">🪞 Imagen</button>
-    <button class="tnav-btn" id="tnav-senales" onclick="showTool('senales')">🔍 Señales</button>
-    <button class="tnav-btn" id="tnav-cita" onclick="showTool('cita')">🌆 Cita</button>
-    <button class="tnav-btn" id="tnav-coach" onclick="showTool('coach')">🧠 Coach</button>
-    <button class="tnav-btn" id="tnav-hist" onclick="showTool('hist')">📋 Historial</button>
-  </div>
-  <div class="topbar-right">
-<button class="topbar-install" id="topbar-install" onclick="triggerInstall()">📲 Instalar app</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg">Listo</span></div>
-
-<div class="desktop-layout desktop-only">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sb-section">Herramientas</div>
-    <button class="sb-item active" id="sb-home" onclick="showHome()"><span class="sb-icon">⊞</span> Inicio</button>
-    <button class="sb-item" id="sb-emergencia" onclick="showTool('emergencia')"><span class="sb-icon">🚨</span> Emergencia</button>
-    <button class="sb-item" id="sb-chat" onclick="showTool('chat')"><span class="sb-icon">💬</span> Analizar Chat</button>
-    <button class="sb-item" id="sb-primer" onclick="showTool('primer')"><span class="sb-icon">✍🏼</span> Primer Mensaje</button>
-    <button class="sb-item" id="sb-imagen" onclick="showTool('imagen')"><span class="sb-icon">🪞</span> Asesor Imagen</button>
-    <button class="sb-item" id="sb-perfil" onclick="showTool('perfil')"><span class="sb-icon">📱</span> Perfil</button>
-    <button class="sb-item" id="sb-cita" onclick="showTool('cita')"><span class="sb-icon">🌆</span> Cita Perfecta</button>
-    <button class="sb-item" id="sb-senales" onclick="showTool('senales')"><span class="sb-icon">🔍</span> Señales</button>
-    <button class="sb-item" id="sb-ghosting" onclick="showTool('ghosting')"><span class="sb-icon">👻</span> Anti-Ghosting</button>
-    <button class="sb-item" id="sb-compat" onclick="showTool('compat')"><span class="sb-icon">💘</span> Compatibilidad</button>
-    <button class="sb-item" id="sb-coach" onclick="showTool('coach')"><span class="sb-icon">🧠</span> Coach Personal</button>
-    <button class="sb-item" id="sb-audio" onclick="showTool('audio')"><span class="sb-icon">🎙️</span> Voz</button>
-    <button class="sb-item" id="sb-live" onclick="showTool('live')"><span class="sb-icon">📡</span> Cita en Vivo</button>
-    <div class="sb-section">Cuenta</div>
-    <button class="sb-item" id="sb-hist" onclick="showTool('hist')"><span class="sb-icon">📋</span> Historial</button>
+<div id="app">
+  <!-- HEADER -->
+  <div id="hdr">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="logo-mark">W</div>
+      <div>
+        <div class="logo-name">WINGMAN AI</div>
+        <div class="logo-sub">Coach de Conquista</div>
+      </div>
+    </div>
+    <button id="btn-install-hdr" onclick="doInstall()">📲 Instalar app</button>
   </div>
 
-  <!-- Main content -->
-  <div class="main-content">
+  <!-- MAIN -->
+  <div id="main">
+    <!-- ONBOARDING -->
+    <div id="screen-onboard" style="display:none"></div>
 
     <!-- HOME -->
-    <div class="tool-panel active" id="d-home">
-      <div class="page-hdr">
-        <div class="page-badge">Coach de Conquista · IA</div>
-        <h1 class="page-h">¿Qué necesitás <em>hoy?</em></h1>
-        <p class="page-p">Elegí una herramienta o usá la barra lateral para navegar.</p>
+    <div id="screen-home" style="display:none">
+      <div class="home-top">
+        <div class="home-greet" id="greet-txt">Hola</div>
+        <h1 class="home-h">¿QUÉ<br/>NECESITÁS <em>HOY?</em></h1>
+        <p class="home-sub">Elegí una herramienta. Consejos reales, sin vueltas.</p>
       </div>
-      <div class="emergency-card" onclick="showTool('emergencia')">
-        <div class="emg-pulse"></div>
-        <div class="emg-text">
-          <div class="emg-title">🚨 Modo Emergencia — Necesito responder ahora</div>
-          <div class="emg-sub">Respuesta instantánea sin formulario. Describí la situación en 1 línea.</div>
+      <div style="padding:16px 22px 0;max-width:1040px;margin:0 auto">
+        <div class="emg-strip" onclick="openTool('live')">
+          <div class="emg-dot"></div>
+          <div class="emg-text">
+            <div class="t1">⚡ ESTOY EN LA CITA AHORA</div>
+            <div class="t2">Respuesta instantánea — necesito contestar ya</div>
+          </div>
+          <div class="emg-arrow">→</div>
         </div>
-        <span style="color:var(--ember);font-size:1.2rem;">→</span>
       </div>
-      <div class="tool-grid">
-        <div class="tc" onclick="showTool('chat')"><span class="tc-icon">💬</span><div class="tc-name">Analizar Conversación</div><div class="tc-desc">La IA lee el chat y te da la respuesta exacta para avanzar</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('primer')"><span class="tc-icon">✍🏼</span><div class="tc-name">Primer Mensaje</div><div class="tc-desc">Único, personalizado, imposible de ignorar</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('imagen')"><span class="tc-icon">🪞</span><div class="tc-name">Asesor de Imagen</div><div class="tc-desc">Foto o descripción — analizá tu look con IA</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('perfil')"><span class="tc-icon">📱</span><div class="tc-name">Optimizar Perfil</div><div class="tc-desc">Bio y fotos para conseguir más matches</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('cita')"><span class="tc-icon">🌆</span><div class="tc-name">Cita Perfecta</div><div class="tc-desc">Un plan memorable basado en cómo es ella</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('senales')"><span class="tc-icon">🔍</span><div class="tc-name">Leer Señales</div><div class="tc-desc">¿Le gustás? Veredicto honesto y directo</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('ghosting')"><span class="tc-icon">👻</span><div class="tc-name">Anti-Ghosting</div><div class="tc-desc">Retomá la conversación con dignidad</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="showTool('compat')"><span class="tc-icon">💘</span><div class="tc-name">Compatibilidad</div><div class="tc-desc">Análisis real de si tienen futuro juntos</div><div class="tc-arrow">→</div></div>
-        <div class="tc wide" onclick="showTool('coach')"><span class="tc-icon">🧠</span><div class="tc-name">Coach Personal</div><div class="tc-desc">Cualquier pregunta. Sin filtros, sin rodeos. Tu mentor disponible 24/7.</div><div class="tc-arrow">→</div></div>
+      <div class="tool-grid" id="tool-grid"></div>
+    </div>
+
+    <!-- PANEL -->
+    <div id="screen-panel" style="display:none">
+      <div class="panel-hdr">
+        <button class="btn-back" onclick="goHome()">←</button>
+        <span class="panel-title" id="panel-title-txt"></span>
+      </div>
+      <div style="flex:1;overflow-y:auto" id="panel-scroll">
+        <div class="panel-body" id="panel-body"></div>
       </div>
     </div>
 
-    <!-- DESKTOP TOOL PANELS (generated by JS) -->
-    <div class="tool-panel" id="d-emergencia"><div class="tool-panel-inner" id="di-emergencia"></div></div>
-    <div class="tool-panel" id="d-chat"><div class="tool-panel-inner" id="di-chat"></div></div>
-    <div class="tool-panel" id="d-primer"><div class="tool-panel-inner" id="di-primer"></div></div>
-    <div class="tool-panel" id="d-imagen"><div class="tool-panel-inner" id="di-imagen"></div></div>
-    <div class="tool-panel" id="d-perfil"><div class="tool-panel-inner" id="di-perfil"></div></div>
-    <div class="tool-panel" id="d-cita"><div class="tool-panel-inner" id="di-cita"></div></div>
-    <div class="tool-panel" id="d-senales"><div class="tool-panel-inner" id="di-senales"></div></div>
-    <div class="tool-panel" id="d-ghosting"><div class="tool-panel-inner" id="di-ghosting"></div></div>
-    <div class="tool-panel" id="d-compat"><div class="tool-panel-inner" id="di-compat"></div></div>
-    <div class="tool-panel" id="d-coach"><div class="tool-panel-inner" id="di-coach"></div></div>
-    <div class="tool-panel" id="d-audio"><div class="tool-panel-inner" id="di-audio"></div></div>
-    <div class="tool-panel" id="d-live"><div class="tool-panel-inner" id="di-live"></div></div>
-    <div class="tool-panel" id="d-hist">
-      <div class="page-hdr"><h2 class="page-h" style="font-size:1.8rem;">Historial</h2><p class="page-p">Tus análisis guardados</p></div>
-      <div id="d-hist-list"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MOBILE ═══ -->
-<div class="mobile-hdr mobile-only">
-  <div class="m-logo">
-    <div class="m-logo-mark">W</div>
-    <div><div class="m-logo-name">WingmanAI</div><div class="m-logo-sub">Coach de Conquista</div></div>
-  </div>
-  <button class="mobile-install-btn" id="mobile-install" onclick="triggerInstall()">📲 Instalar</button>
-</div>
-
-<div class="mobile-app mobile-only">
-  <!-- Home -->
-  <div class="mobile-home on" id="m-home">
-    <div class="m-home-top">
-      <div class="m-greet" id="m-greet">Bienvenido</div>
-      <div class="m-title">¿Qué necesitás <em>hoy?</em></div>
-    </div>
-    <div class="m-emergency" onclick="openMPanel('emergencia')">
-      <div class="emg-pulse"></div>
-      <div><div class="emg-title">🚨 Modo Emergencia</div><div class="emg-sub">Respuesta instantánea ahora mismo</div></div>
-      <span style="color:var(--ember);margin-left:auto;">→</span>
-    </div>
-    <div class="m-grid-scroll">
-      <div class="m-tool-grid">
-        <div class="tc wide" onclick="openMPanel('chat')"><span class="tc-icon">💬</span><div class="tc-name">Analizar Conversación</div><div class="tc-desc">Respuesta exacta para avanzar</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('primer')"><span class="tc-icon">✍🏼</span><div class="tc-name">Primer Mensaje</div><div class="tc-desc">Único y personalizado</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('imagen')"><span class="tc-icon">🪞</span><div class="tc-name">Asesor Imagen</div><div class="tc-desc">Foto o texto</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('perfil')"><span class="tc-icon">📱</span><div class="tc-name">Perfil</div><div class="tc-desc">Más matches</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('cita')"><span class="tc-icon">🌆</span><div class="tc-name">Cita Perfecta</div><div class="tc-desc">Plan memorable</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('senales')"><span class="tc-icon">🔍</span><div class="tc-name">Señales</div><div class="tc-desc">¿Le gustás?</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('ghosting')"><span class="tc-icon">👻</span><div class="tc-name">Anti-Ghosting</div><div class="tc-desc">Retomá con dignidad</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('compat')"><span class="tc-icon">💘</span><div class="tc-name">Compat.</div><div class="tc-desc">¿Tienen futuro?</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('audio')"><span class="tc-icon">🎙️</span><div class="tc-name">Por Voz</div><div class="tc-desc">Grabá tu situación</div><div class="tc-arrow">→</div></div>
-        <div class="tc" onclick="openMPanel('live')"><span class="tc-icon">📡</span><div class="tc-name">Cita en Vivo</div><div class="tc-desc">Durante la cita</div><div class="tc-arrow">→</div></div>
-        <div class="tc wide" onclick="openMPanel('coach')"><span class="tc-icon">🧠</span><div class="tc-name">Coach Personal</div><div class="tc-desc">Cualquier pregunta. Sin filtros ni rodeos. 24/7.</div><div class="tc-arrow">→</div></div>
+    <!-- HISTORIAL -->
+    <div id="screen-hist" style="display:none">
+      <div class="panel-hdr">
+        <button class="btn-back" onclick="goHome()">←</button>
+        <span class="panel-title">📋 HISTORIAL</span>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div class="panel-body" id="hist-body"></div>
       </div>
     </div>
   </div>
 
-  <!-- Mobile panels container -->
-  <div id="m-panels"></div>
-
-  <!-- Mobile historial -->
-  <div class="mobile-panel" id="m-panel-hist">
-    <div class="panel-hdr">
-      <button class="btn-back" onclick="closeMPanel()">←</button>
-      <div><div class="ph-title">Historial</div><div class="ph-sub">Tus análisis guardados</div></div>
-      <div class="ph-icon">📋</div>
-    </div>
-    <div class="panel-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;" id="m-hist-list"></div>
+  <!-- BOTTOM NAV -->
+  <div id="bnav">
+    <button class="ni on" id="ni-home" onclick="goHome()">
+      <span class="ni-icon">⊞</span><span class="ni-label">Inicio</span>
+    </button>
+    <button class="ni" id="ni-chat" onclick="openTool('chat')">
+      <span class="ni-icon">💬</span><span class="ni-label">Chat</span>
+    </button>
+    <button class="ni" id="ni-coach" onclick="openTool('coach')">
+      <span class="ni-icon">🧠</span><span class="ni-label">Coach</span>
+    </button>
+    <button class="ni" id="ni-hist" onclick="showHist()">
+      <span class="ni-icon">📋</span><span class="ni-label">Historial</span>
+    </button>
+    <button class="ni" id="ni-install" style="display:none" onclick="doInstall()">
+      <span class="ni-icon">📲</span><span class="ni-label">Instalar</span>
+    </button>
   </div>
 </div>
 
-<div class="bnav mobile-only">
-  <button class="ni on" id="ni-home" onclick="mGoHome()"><span class="ni-icon">⊞</span><span class="ni-label">Inicio</span></button>
-  <button class="ni" id="ni-chat" onclick="openMPanel('chat')"><span class="ni-icon">💬</span><span class="ni-label">Chat</span></button>
-  <button class="ni" id="ni-imagen" onclick="openMPanel('imagen')"><span class="ni-icon">🪞</span><span class="ni-label">Imagen</span></button>
-  <button class="ni" id="ni-hist" onclick="openMHist()"><span class="ni-icon">📋</span><span class="ni-label">Historial</span></button>
-  <button class="ni" id="ni-coach" onclick="openMPanel('coach')"><span class="ni-icon">🧠</span><span class="ni-label">Coach</span></button>
-</div>
+<!-- TOAST -->
+<div id="toast">✓ <span id="toast-msg"></span></div>
 
 <script>
-/* ═══════════════════════════════════
-   CANVAS BG
-═══════════════════════════════════ */
-(function(){
-  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
-  let W,H,pts=[];
-  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  for(let i=0;i<24;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.4+.4,a:Math.random()*.35+.08});
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    pts.forEach((p,i)=>{
-      pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<150){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(184,115,51,${.05*(1-d/150)})`;ctx.lineWidth=.5;ctx.stroke();}});
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(184,115,51,${p.a})`;ctx.fill();
-      p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
 
-/* ═══════════════════════════════════
-   STATE
-═══════════════════════════════════ */
-let deferredInstall=null;
-let imgBase64=null,imgMime=null;
-let mediaRec=null,audioChunks=[],recInterval=null,recSecs=0;
-const IS_MOBILE=()=>window.innerWidth<768;
 
-/* ═══════════════════════════════════
-   PWA INSTALL
-═══════════════════════════════════ */
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();deferredInstall=e;
-  document.getElementById('topbar-install').classList.add('show');
-  document.getElementById('mobile-install').classList.add('show');
-});
+const SYSTEM = `Sos un experto en seducción y atracción con 25 años de experiencia real, no teoría de libro.
+Hablás español rioplatense. Sos directo, crudo, sin filtros. Decís exactamente lo que el tipo necesita escuchar aunque duela.
+Como el mejor amigo que te dice la verdad: nada de suavizarlo, nada de "quizás", nada de políticamente correcto.
+Tus consejos son accionables, específicos y probados en la vida real.
+Cuando das mensajes para copiar/pegar, ponelos entre comillas o en negrita con ** **.
+Formato: secciones cortas con emoji, al punto, máximo 420 palabras. No des sermones, no moralices.`;
 
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('topbar-install').classList.remove('show');
-  document.getElementById('mobile-install').classList.remove('show');
-});
-
-function triggerInstall(){
-  if(deferredInstall){
-    deferredInstall.prompt();
-    deferredInstall.userChoice.then(r=>{
-      if(r.outcome==='accepted'){
-        document.getElementById('topbar-install').classList.remove('show');
-        document.getElementById('mobile-install').classList.remove('show');
-      }
-      deferredInstall=null;
-    });
-  } else {
-    showToast('En iOS: Safari → Compartir → "Agregar a inicio" 📲','📱');
-  }
+/* ════════════════════════════════════════════
+   GROQ API
+════════════════════════════════════════════ */
+async function callGroq(prompt) {
+  const r = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system: SYSTEM,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d?.error?.message || `Error ${r.status}`);
+  return d.result || 'Sin respuesta.';
 }
 
-/* ═══════════════════════════════════
-   TOAST
-═══════════════════════════════════ */
-function showToast(msg,icon='✓'){
-  const t=document.getElementById('toast');
-  document.getElementById('toast-msg').textContent=msg;
-  document.getElementById('toast-icon').textContent=icon;
-  t.classList.add('on');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3500);
+/* ════════════════════════════════════════════
+   TOOLS CONFIG
+════════════════════════════════════════════ */
+const TOOLS = [
+  { id:'chat',     icon:'💬', name:'ANALIZÁ EL CHAT',  desc:'Score de interés + respuesta exacta' },
+  { id:'primer',   icon:'🎯', name:'PRIMER MENSAJE',   desc:'El mensaje que no puede ignorar' },
+  { id:'senales',  icon:'🔍', name:'LEER SEÑALES',     desc:'¿Te quiere o te carga? Veredicto real' },
+  { id:'cita',     icon:'🔥', name:'CITA PERFECTA',    desc:'Plan completo para cerrar bien' },
+  { id:'ghosting', icon:'👻', name:'ANTI-GHOSTING',    desc:'Cómo volver sin perder dignidad' },
+  { id:'perfil',   icon:'📱', name:'PERFIL TINDER',    desc:'Bio y fotos que generan matches' },
+  { id:'imagen',   icon:'💪', name:'TU IMAGEN',        desc:'Qué cambiar para impresionar más' },
+  { id:'coach',    icon:'🧠', name:'COACH SIN FILTROS',desc:'Preguntá lo que sea, respuesta cruda' },
+];
+
+/* ════════════════════════════════════════════
+   PROMPTS
+════════════════════════════════════════════ */
+let userProfile = {};
+
+function getProfile() {
+  if (!userProfile.edad) return '';
+  return `[PERFIL: ${userProfile.edad} años, busca ${userProfile.busca||'?'}, principal obstáculo: ${userProfile.desafio||'?'}]\n\n`;
 }
 
-function copyText(text){
-  navigator.clipboard.writeText(text).then(()=>showToast('Copiado al portapapeles'));
-}
-
-/* ═══════════════════════════════════
-   TOOL HTML BUILDER
-═══════════════════════════════════ */
-const TOOLS={
-  emergencia:{icon:'🚨',title:'Modo Emergencia',sub:'Respuesta instantánea ahora mismo',
-    html:()=>`
-    <div class="field"><label class="flabel">Describí la situación en 1-2 líneas</label>
-    <textarea id="t-emergencia" rows="3" placeholder="Ella me escribió 'Hola, ¿cómo estás?' después de 3 días sin hablar. ¿Qué respondo?" oninput="ccx(this,'c-emergencia',100)"></textarea>
-    <div class="cc" id="c-emergencia">0/100</div></div>
-    <button class="cta" style="background:linear-gradient(135deg,#7a1500,var(--ember),#ffaa60);box-shadow:0 5px 24px rgba(255,107,53,.35);" onclick="runTool('emergencia')">🚨 Dame la respuesta YA</button>
-    <div class="sk-wrap" id="sk-emergencia"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div></div>
-    <div class="res-card" id="res-emergencia" style="border-color:rgba(255,107,53,.25);">
-      <div class="res-top" style="background:rgba(255,107,53,.06);"><div class="res-label" style="color:#ff9966;">Respuesta instantánea</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-emergencia-body')">Copiar</button></div></div>
-      <div class="res-body" id="res-emergencia-body"></div>
-    </div>`},
-
-  chat:{icon:'💬',title:'Analizar Conversación',sub:'Score + respuesta exacta en tiempo real',
-    html:()=>`
-    <div class="field"><label class="flabel">El chat completo</label>
-    <textarea id="t-chat" rows="7" placeholder="Ella: Hola! cómo estás?&#10;Yo: Bien y vos?&#10;Ella: Bien jaja, qué hiciste hoy?&#10;..." oninput="ccx(this,'c-chat',2000)"></textarea>
-    <div class="cc" id="c-chat">0/2000</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">Objetivo</label>
-      <select id="s-chat-obj"><option>¿Qué respondo?</option><option>Invitarla a salir</option><option>Pedirle el número</option><option>Retomar conversación fría</option><option>Crear tensión</option><option>Arreglar algo que salió mal</option></select></div>
-      <div class="field"><label class="flabel">Mi estilo</label>
-      <select id="s-chat-est"><option>Directo y seguro</option><option>Divertido y relajado</option><option>Misterioso</option><option>Romántico</option><option>Intelectual</option></select></div>
-    </div>
-    <div class="field"><label class="flabel">Intensidad</label>
-    <div class="seg" id="seg-chat"><button class="seg-b on" onclick="setSeg(this)">Sutil</button><button class="seg-b" onclick="setSeg(this)">Equilibrado</button><button class="seg-b" onclick="setSeg(this)">Al hueso</button></div></div>
-    <button class="cta" onclick="runTool('chat')">⚡ Analizá y decime qué hacer</button>
-    <div class="sk-wrap" id="sk-chat"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk-gap"></div><div class="sk sk-line w55"></div><div class="sk sk-line w90"></div></div>
-    <div class="score-wrap" id="score-chat" style="display:none;">
-      <div class="score-top"><div><div class="score-title">Score de la conversación</div><div style="font-size:.75rem;color:var(--fog2);margin-top:2px;" id="score-chat-label">…</div></div>
-      <div class="score-ring-wrap"><svg viewBox="0 0 70 70"><circle class="trk" cx="35" cy="35" r="30"/><circle class="fill" id="score-chat-ring" cx="35" cy="35" r="30"/></svg><div class="score-label-center"><span id="score-chat-num">0</span><span>/ 10</span></div></div></div>
-      <div class="sbar-row"><span class="sbar-label">Interés</span><div class="sbar-track"><div class="sbar-fill" id="sb-interes"></div></div><span class="sbar-val" id="sv-interes">0</span></div>
-      <div class="sbar-row"><span class="sbar-label">Momentum</span><div class="sbar-track"><div class="sbar-fill" id="sb-momentum"></div></div><span class="sbar-val" id="sv-momentum">0</span></div>
-      <div class="sbar-row"><span class="sbar-label">Potencial</span><div class="sbar-track"><div class="sbar-fill" id="sb-potencial"></div></div><span class="sbar-val" id="sv-potencial">0</span></div>
-    </div>
-    <div class="res-card" id="res-chat"><div class="res-top"><div class="res-label">Análisis completo</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-chat-body')">Copiar</button><button class="btn-act" onclick="runTool('chat')">↺</button></div></div><div class="res-body" id="res-chat-body"></div></div>`},
-
-  primer:{icon:'✍🏼',title:'Primer Mensaje',sub:'Único, personalizado, efectivo',
-    html:()=>`
-    <div class="field"><label class="flabel">¿Cómo es ella / cómo la conociste?</label>
-    <textarea id="t-primer" rows="5" placeholder="La vi en Tinder. Fotos viajando, le gusta el café y el senderismo. Parece inteligente y divertida..." oninput="ccx(this,'c-primer',500)"></textarea>
-    <div class="cc" id="c-primer">0/500</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">Tono</label><select id="s-primer-tono"><option>Ingenioso / humor</option><option>Directo y confiado</option><option>Pregunta curiosa</option><option>Cumplido genuino</option><option>Provocador</option></select></div>
-      <div class="field"><label class="flabel">Plataforma</label><select id="s-primer-plat"><option>Tinder / Bumble</option><option>Instagram DM</option><option>WhatsApp</option><option>La conocí en persona</option><option>LinkedIn</option></select></div>
-    </div>
-    <div class="field"><label class="flabel">Cantidad</label>
-    <div class="seg" id="seg-primer"><button class="seg-b on" onclick="setSeg(this)">3 opciones</button><button class="seg-b" onclick="setSeg(this)">5 opciones</button><button class="seg-b" onclick="setSeg(this)">Solo la mejor</button></div></div>
-    <button class="cta" onclick="runTool('primer')">✨ Generar mensajes</button>
-    <div class="sk-wrap" id="sk-primer"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w90"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-primer"><div class="res-top"><div class="res-label">Tus mensajes</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-primer-body')">Copiar</button><button class="btn-act" onclick="runTool('primer')">↺</button></div></div><div class="res-body" id="res-primer-body"></div></div>`},
-
-  imagen:{icon:'🪞',title:'Asesor de Imagen',sub:'Foto o texto — la IA analiza tu look',
-    html:()=>`
-    <div class="field"><label class="flabel">Modo</label>
-    <div class="seg" id="seg-img"><button class="seg-b on" onclick="setImgModo('texto',this)">✏️ Texto</button><button class="seg-b" onclick="setImgModo('foto',this)">📸 Foto</button><button class="seg-b" onclick="setImgModo('ambos',this)">🔀 Ambos</button></div></div>
-    <div id="img-foto" style="display:none;" class="field"><label class="flabel">Tu foto</label>
-    <input type="file" id="foto-file" accept="image/*" style="display:none" onchange="loadFoto(this)">
-    <div class="dropzone" id="dz" onclick="document.getElementById('foto-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dropFoto(event)">
-      <div id="dz-ph"><div class="dz-icon">📷</div><div class="dz-text">Tocá para subir tu foto</div><div class="dz-hint">JPG, PNG — máx 5MB</div></div>
-      <div class="foto-prev" id="foto-prev"><img id="foto-img" src="" alt=""><div class="foto-prev-name" id="foto-name"></div><button class="btn-clrfoto" onclick="clearFoto(event)">✕ Cambiar</button></div>
-    </div></div>
-    <div id="img-txt" class="field"><label class="flabel">Describí tu outfit y look</label>
-    <textarea id="t-imagen" rows="4" placeholder="Jean slim azul oscuro, camisa blanca de lino, zapatillas Nike blancas, reloj negro…" oninput="ccx(this,'c-imagen',500)"></textarea>
-    <div class="cc" id="c-imagen">0/500</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">Ocasión</label><select id="s-img-oc"><option>Primera cita</option><option>Segunda cita</option><option>Salida nocturna</option><option>Día a día</option><option>Foto de perfil</option><option>Evento especial</option></select></div>
-      <div class="field"><label class="flabel">Estilo objetivo</label><select id="s-img-est"><option>Casual cool</option><option>Smart Casual</option><option>Streetwear</option><option>Clásico / Elegante</option><option>Deportivo</option></select></div>
-    </div>
-    <div class="field"><label class="flabel">Mejorar</label>
-    <div class="chips" id="chips-img">
-      <span class="chip on" onclick="this.classList.toggle('on')">Look general</span>
-      <span class="chip" onclick="this.classList.toggle('on')">Colores</span>
-      <span class="chip" onclick="this.classList.toggle('on')">Prendas</span>
-      <span class="chip" onclick="this.classList.toggle('on')">Accesorios</span>
-      <span class="chip" onclick="this.classList.toggle('on')">Grooming</span>
-    </div></div>
-    <button class="cta" onclick="runImagen()" style="background:linear-gradient(135deg,#2a0050,#7b2ff7,#c77dff);box-shadow:0 5px 24px rgba(123,47,247,.3);">🪞 Analizar mi imagen</button>
-    <div class="sk-wrap" id="sk-imagen"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-imagen" style="border-color:rgba(123,47,247,.25);"><div class="res-top" style="background:rgba(123,47,247,.06);"><div class="res-label" style="color:#c77dff;">Análisis de imagen</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-imagen-body')">Copiar</button><button class="btn-act" onclick="runImagen()">↺</button></div></div><div class="res-body" id="res-imagen-body"></div></div>`},
-
-  perfil:{icon:'📱',title:'Optimizar Perfil',sub:'Más matches con bio perfecta',
-    html:()=>`
-    <div class="field"><label class="flabel">Bio actual + descripción de fotos</label>
-    <textarea id="t-perfil" rows="5" placeholder="Bio: 'Ingeniero, 28. Me gusta el fútbol y los viajes.'&#10;Fotos: selfie, foto gym, grupal, con perro…" oninput="ccx(this,'c-perfil',800)"></textarea>
-    <div class="cc" id="c-perfil">0/800</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">Buscás</label><select id="s-perfil-obj"><option>Relación seria</option><option>Conocer personas</option><option>Salidas y aventuras</option><option>No sé aún</option></select></div>
-      <div class="field"><label class="flabel">Edad</label><select id="s-perfil-edad"><option>18-24</option><option>25-30</option><option>31-38</option><option>38+</option></select></div>
-    </div>
-    <button class="cta" onclick="runTool('perfil')">🔍 Analizar mi perfil</button>
-    <div class="sk-wrap" id="sk-perfil"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-perfil"><div class="res-top"><div class="res-label">Análisis de perfil</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-perfil-body')">Copiar</button><button class="btn-act" onclick="runTool('perfil')">↺</button></div></div><div class="res-body" id="res-perfil-body"></div></div>`},
-
-  cita:{icon:'🌆',title:'Cita Perfecta',sub:'Un plan que ella no va a olvidar',
-    html:()=>`
-    <div class="field"><label class="flabel">¿Cómo es ella?</label>
-    <textarea id="t-cita" rows="4" placeholder="Le gusta el arte, es aventurera, trabaja en diseño, sentido del humor ácido…" oninput="ccx(this,'c-cita',500)"></textarea>
-    <div class="cc" id="c-cita">0/500</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">Presupuesto</label><select id="s-cita-pres"><option>Bajo ($0-15)</option><option>Medio ($15-50)</option><option>Alto ($50+)</option><option>Sin límite</option></select></div>
-      <div class="field"><label class="flabel">¿Qué cita es?</label><select id="s-cita-num"><option>Primera cita</option><option>Segunda cita</option><option>Cita especial</option><option>Reconciliación</option></select></div>
-    </div>
-    <div class="field"><label class="flabel">Ciudad / zona <span class="opt">opcional</span></label><input type="text" id="t-cita-ciudad" placeholder="Ej: Tucumán, Buenos Aires…"></div>
-    <button class="cta" onclick="runTool('cita')">🌆 Diseñar mi cita</button>
-    <div class="sk-wrap" id="sk-cita"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-cita"><div class="res-top"><div class="res-label">Tu plan de cita</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-cita-body')">Copiar</button><button class="btn-act" onclick="runTool('cita')">↺ Otra idea</button></div></div><div class="res-body" id="res-cita-body"></div></div>`},
-
-  senales:{icon:'🔍',title:'Leer Señales',sub:'Veredicto honesto sin vueltas',
-    html:()=>`
-    <div class="field"><label class="flabel">Describí la situación</label>
-    <textarea id="t-senales" rows="5" placeholder="Nos conocimos en el gym. Siempre me sonríe pero no inicia. Me escribió por Instagram…" oninput="ccx(this,'c-senales',800)"></textarea>
-    <div class="cc" id="c-senales">0/800</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">¿Hace cuánto?</label><select id="s-sen-t"><option>Pocos días</option><option>Unas semanas</option><option>Varios meses</option><option>Amigos hace tiempo</option><option>Ex pareja</option></select></div>
-      <div class="field"><label class="flabel">Contexto</label><select id="s-sen-c"><option>App de citas</option><option>La conozco en persona</option><option>Trabajo / estudio</option><option>Amigos en común</option><option>Redes sociales</option></select></div>
-    </div>
-    <button class="cta" onclick="runTool('senales')">🔮 Leer sus señales</button>
-    <div class="sk-wrap" id="sk-senales"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-senales"><div class="res-top"><div class="res-label">Veredicto</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-senales-body')">Copiar</button></div></div><div class="res-body" id="res-senales-body"></div></div>`},
-
-  ghosting:{icon:'👻',title:'Anti-Ghosting',sub:'Retomá con dignidad',
-    html:()=>`
-    <div class="field"><label class="flabel">¿Qué pasó antes del ghosting?</label>
-    <textarea id="t-ghosting" rows="4" placeholder="Hablamos muy bien por 2 semanas, cita increíble, le mandé un mensaje y quedé en visto…" oninput="ccx(this,'c-ghosting',600)"></textarea>
-    <div class="cc" id="c-ghosting">0/600</div></div>
-    <div class="g2">
-      <div class="field"><label class="flabel">¿Cuánto tiempo?</label><select id="s-ghost-t"><option>1-3 días</option><option>4-7 días</option><option>1-2 semanas</option><option>Más de 2 semanas</option><option>Meses</option></select></div>
-      <div class="field"><label class="flabel">¿Qué tan importante?</label><select id="s-ghost-n"><option>Solo hablamos online</option><option>Salimos 1 vez</option><option>Varias citas</option><option>Era algo serio</option></select></div>
-    </div>
-    <button class="cta" onclick="runTool('ghosting')">👻 Generar mensaje de rescate</button>
-    <div class="sk-wrap" id="sk-ghosting"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w90"></div></div>
-    <div class="res-card" id="res-ghosting"><div class="res-top"><div class="res-label">Tu mensaje anti-ghosting</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-ghosting-body')">Copiar</button><button class="btn-act" onclick="runTool('ghosting')">↺</button></div></div><div class="res-body" id="res-ghosting-body"></div></div>`},
-
-  compat:{icon:'💘',title:'Compatibilidad',sub:'¿Realmente tienen futuro?',
-    html:()=>`
-    <div class="field"><label class="flabel">Sobre vos</label>
-    <textarea id="t-yo" rows="3" placeholder="Introvertido, trabajo en tecnología, me gusta el fútbol. Busco algo serio…" oninput="ccx(this,'c-yo',400)"></textarea>
-    <div class="cc" id="c-yo">0/400</div></div>
-    <div class="field"><label class="flabel">Sobre ella</label>
-    <textarea id="t-ella" rows="3" placeholder="Extrovertida, trabaja en marketing, le encanta socializar. Muy creativa…" oninput="ccx(this,'c-ella',400)"></textarea>
-    <div class="cc" id="c-ella">0/400</div></div>
-    <button class="cta" onclick="runTool('compat')">💘 Analizar compatibilidad</button>
-    <div class="sk-wrap" id="sk-compat"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div></div>
-    <div class="res-card" id="res-compat"><div class="res-top"><div class="res-label">Análisis de compatibilidad</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-compat-body')">Copiar</button></div></div><div class="res-body" id="res-compat-body"></div></div>`},
-
-  coach:{icon:'🧠',title:'Coach Personal',sub:'Sin filtros · Sin rodeos · 24/7',
-    html:()=>`
-    <div class="field"><label class="flabel">Tu pregunta</label>
-    <textarea id="t-coach" rows="4" placeholder="¿Cómo salgo de la friendzone? ¿Cómo creo tensión sin quedar desesperado?…" oninput="ccx(this,'c-coach',600)"></textarea>
-    <div class="cc" id="c-coach">0/600</div></div>
-    <div class="sec-label">Preguntas frecuentes</div>
-    <div class="chips" style="margin-bottom:18px;">
-      <span class="chip" onclick="setCoachQ(this)">¿Cómo salir de la friendzone?</span>
-      <span class="chip" onclick="setCoachQ(this)">Me pongo nervioso al hablarle</span>
-      <span class="chip" onclick="setCoachQ(this)">¿Cuándo proponer la cita?</span>
-      <span class="chip" onclick="setCoachQ(this)">Crear tensión y coqueteo</span>
-      <span class="chip" onclick="setCoachQ(this)">Siempre termino como el amigo</span>
-      <span class="chip" onclick="setCoachQ(this)">Cómo no quedar desesperado</span>
-      <span class="chip" onclick="setCoachQ(this)">Mejorar mi autoconfianza</span>
-      <span class="chip" onclick="setCoachQ(this)">Mi ex me escribió de nuevo</span>
-    </div>
-    <button class="cta" onclick="runTool('coach')">🧠 Preguntarle al coach</button>
-    <div class="sk-wrap" id="sk-coach"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-coach"><div class="res-top"><div class="res-label">Coach personal</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-coach-body')">Copiar</button></div></div><div class="res-body" id="res-coach-body"></div></div>`},
-
-  audio:{icon:'🎙️',title:'Análisis por Voz',sub:'Grabá tu situación y la IA analiza',
-    html:()=>`
-    <div style="background:var(--depth);border:1px solid var(--wire);border-radius:16px;padding:22px;text-align:center;margin-bottom:18px;">
-      <div id="audio-idle"><div style="font-size:2.8rem;margin-bottom:10px;opacity:.6;">🎙️</div>
-      <div style="font-size:.9rem;color:var(--fog);margin-bottom:4px;">Tocá para grabar tu situación</div>
-      <div style="font-size:.73rem;color:var(--fog2);">Describila en voz alta · máx 60 seg</div>
-      <button class="cta" style="margin-top:18px;max-width:200px;" onclick="startRec()">⏺ Grabar</button></div>
-      <div id="audio-recording" style="display:none;">
-      <div style="font-size:2.8rem;margin-bottom:10px;animation:emgpulse 1s infinite;">🔴</div>
-      <div style="font-size:.9rem;color:var(--ember);font-weight:700;" id="rec-timer">0 seg</div>
-      <button class="cta" style="max-width:180px;margin-top:14px;background:linear-gradient(135deg,#7a0000,#cc2200,#ff5533);" onclick="stopRec()">⏹ Detener</button></div>
-      <div id="audio-done" style="display:none;">
-      <div style="font-size:2rem;margin-bottom:8px;">✅</div>
-      <div style="font-size:.85rem;color:var(--chalk);margin-bottom:10px;" id="audio-preview">Grabación lista</div>
-      <button class="btn-act" onclick="resetAudio()">↺ Grabar de nuevo</button></div>
-    </div>
-    <div class="field"><label class="flabel">Transcripción <span class="opt">— editá si algo quedó mal</span></label>
-    <textarea id="t-audio" rows="4" placeholder="La grabación aparecerá acá, o escribí directo…" oninput="ccx(this,'c-audio',800)"></textarea>
-    <div class="cc" id="c-audio">0/800</div></div>
-    <button class="cta" onclick="runTool('audio')">🎙️ Analizar situación</button>
-    <div class="sk-wrap" id="sk-audio"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div></div>
-    <div class="res-card" id="res-audio"><div class="res-top"><div class="res-label">Análisis por voz</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-audio-body')">Copiar</button></div></div><div class="res-body" id="res-audio-body"></div></div>`},
-
-  live:{icon:'📡',title:'Cita en Vivo',sub:'Estoy en la cita — respuestas en segundos',
-    html:()=>`
-    <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:12px;padding:13px 16px;margin-bottom:16px;font-size:.82rem;color:var(--fog);line-height:1.6;">
-      📡 <strong style="color:var(--ember);">Modo discreto.</strong> Escribí lo que acaba de pasar en 1 línea. Respuestas ultra-cortas para no perder el hilo.
-    </div>
-    <div class="sec-label">Situaciones frecuentes</div>
-    <div class="chips" style="margin-bottom:16px;">
-      <span class="chip" onclick="setLiveQ(this)">Silencio incómodo</span>
-      <span class="chip" onclick="setLiveQ(this)">Mencionó a su ex</span>
-      <span class="chip" onclick="setLiveQ(this)">Me preguntó qué busco</span>
-      <span class="chip" onclick="setLiveQ(this)">¿Cómo propongo la segunda cita?</span>
-      <span class="chip" onclick="setLiveQ(this)">Quiero crear tensión ahora</span>
-      <span class="chip" onclick="setLiveQ(this)">La cita va bien — ¿cuándo la beso?</span>
-    </div>
-    <div class="field"><label class="flabel">¿Qué pasó ahora?</label>
-    <textarea id="t-live" rows="3" placeholder="Acaba de decir que nunca tuvo una cita así… ¿qué respondo?" oninput="ccx(this,'c-live',200)"></textarea>
-    <div class="cc" id="c-live">0/200</div></div>
-    <button class="cta" style="background:linear-gradient(135deg,#7a1500,var(--ember),#ffaa60);box-shadow:0 5px 24px rgba(255,107,53,.35);" onclick="runTool('live')">📡 Dame la respuesta YA</button>
-    <div class="sk-wrap" id="sk-live"><div class="sk sk-title"></div><div class="sk-gap"></div><div class="sk sk-line w70"></div><div class="sk sk-line w55"></div></div>
-    <div class="res-card" id="res-live" style="border-color:rgba(255,107,53,.25);"><div class="res-top" style="background:rgba(255,107,53,.06);"><div class="res-label" style="color:#ff9966;">Respuesta en vivo</div><div class="res-acts"><button class="btn-act" onclick="copyRes('res-live-body')">Copiar</button><button class="btn-act" onclick="runTool('live')">↺</button></div></div><div class="res-body" id="res-live-body"></div></div>`}
-};
-
-/* ═══════════════════════════════════
-   RENDER TOOL (shared for both layouts)
-═══════════════════════════════════ */
-function renderTool(id, container){
-  const t=TOOLS[id];if(!t)return;
-  container.innerHTML=`
-    <div class="panel-hdr">
-      <button class="btn-back" onclick="${IS_MOBILE()?'closeMPanel':'showHome'}()">←</button>
-      <div><div class="ph-title">${t.title}</div><div class="ph-sub">${t.sub}</div></div>
-      <div class="ph-icon">${t.icon}</div>
-    </div>
-    ${t.html()}`;
-}
-
-/* ═══════════════════════════════════
-   DESKTOP NAV
-═══════════════════════════════════ */
-let currentDesktopTool=null;
-
-function showHome(){
-  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('d-home').classList.add('active');
-  document.querySelectorAll('.sb-item,.tnav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sb-home').classList.add('active');
-  document.getElementById('tnav-home').classList.add('active');
-  currentDesktopTool=null;
-}
-
-function showTool(id){
-  if(id==='hist'){showHistDesktop();return;}
-  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
-  const panel=document.getElementById('d-'+id);
-  if(!panel)return;
-  panel.classList.add('active');
-  // Render content if empty
-  const inner=document.getElementById('di-'+id);
-  if(inner&&!inner.hasChildNodes()) renderTool(id,inner);
-  document.querySelectorAll('.sb-item,.tnav-btn').forEach(b=>b.classList.remove('active'));
-  const sb=document.getElementById('sb-'+id);if(sb)sb.classList.add('active');
-  const tn=document.getElementById('tnav-'+id);if(tn)tn.classList.add('active');
-  currentDesktopTool=id;
-  panel.scrollTop=0;
-}
-
-function showHistDesktop(){
-  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('d-hist').classList.add('active');
-  document.querySelectorAll('.sb-item,.tnav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('sb-hist').classList.add('active');
-  const th=document.getElementById('tnav-hist');if(th)th.classList.add('active');
-  renderHistList('d-hist-list');
-}
-
-/* ═══════════════════════════════════
-   MOBILE NAV
-═══════════════════════════════════ */
-function mGoHome(){
-  document.getElementById('m-home').classList.add('on');
-  document.querySelectorAll('.mobile-panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  document.getElementById('ni-home').classList.add('on');
-}
-
-function openMPanel(id){
-  document.getElementById('m-home').classList.remove('on');
-  document.querySelectorAll('.mobile-panel').forEach(p=>p.classList.remove('on'));
-
-  let panel=document.getElementById('m-panel-'+id);
-  if(!panel){
-    panel=document.createElement('div');
-    panel.className='mobile-panel';
-    panel.id='m-panel-'+id;
-    const body=document.createElement('div');
-    body.className='panel-body scrollable';
-    body.style.cssText='overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;';
-    renderTool(id,body);
-    // Fix back button inside panel
-    const backBtn=body.querySelector('.btn-back');
-    if(backBtn)backBtn.setAttribute('onclick','closeMPanel()');
-    panel.appendChild(body);
-    document.getElementById('m-panels').appendChild(panel);
-  }
-  panel.classList.add('on');
-  setMNav(id);
-}
-
-function closeMPanel(){mGoHome();}
-
-function openMHist(){
-  document.getElementById('m-home').classList.remove('on');
-  document.querySelectorAll('.mobile-panel').forEach(p=>p.classList.remove('on'));
-  document.getElementById('m-panel-hist').classList.add('on');
-  renderHistList('m-hist-list');
-  setMNav('hist');
-}
-
-function setMNav(id){
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  const map={home:'ni-home',chat:'ni-chat',imagen:'ni-imagen',hist:'ni-hist',coach:'ni-coach'};
-  const el=document.getElementById(map[id]||'ni-home');
-  if(el)el.classList.add('on');
-}
-
-/* ═══════════════════════════════════
-   FORM HELPERS
-═══════════════════════════════════ */
-function ccx(el,id,max){
-  const n=el.value.length,d=document.getElementById(id);
-  if(!d)return;
-  d.textContent=n+'/'+max;
-  d.style.color=n>max*.88?'var(--ember)':'';
-}
-function setSeg(btn){
-  btn.closest('.seg').querySelectorAll('.seg-b').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-}
-function setCoachQ(el){
-  const t=document.getElementById('t-coach');if(t){t.value=el.textContent;ccx(t,'c-coach',600);}
-}
-function setLiveQ(el){
-  const t=document.getElementById('t-live');if(t){t.value=el.textContent;ccx(t,'c-live',200);}
-}
-function setImgModo(modo,btn){
-  btn.closest('.seg').querySelectorAll('.seg-b').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  const f=document.getElementById('img-foto'),tx=document.getElementById('img-txt');
-  if(f)f.style.display=(modo==='foto'||modo==='ambos')?'block':'none';
-  if(tx)tx.style.display=(modo==='texto'||modo==='ambos')?'block':'none';
-}
-function copyRes(id){
-  const el=document.getElementById(id);
-  if(el)copyText(el.textContent);
-}
-
-/* ═══════════════════════════════════
-   IMAGE UPLOAD
-═══════════════════════════════════ */
-function loadFoto(input){
-  const file=input.files[0];
-  if(!file)return;
-  if(file.size>5*1024*1024){showToast('Foto muy grande (máx 5MB)','⚠️');return;}
-  imgMime=file.type;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    imgBase64=e.target.result.split(',')[1];
-    const img=document.getElementById('foto-img');
-    const name=document.getElementById('foto-name');
-    const ph=document.getElementById('dz-ph');
-    const prev=document.getElementById('foto-prev');
-    if(img)img.src=e.target.result;
-    if(name)name.textContent='✓ '+file.name;
-    if(ph)ph.style.display='none';
-    if(prev)prev.style.display='block';
+function buildPrompt(id, f) {
+  const p = getProfile();
+  const prompts = {
+    chat:`${p}CHAT COMPLETO:\n${f.chat||''}\n\nOBJETIVO: ${f.obj||'qué respondo'}\nTONO MÍO: ${f.tono||'directo'}\n\nAnalizá:\n🌡️ TEMPERATURA (fría/tibia/caliente) — por qué en 1 línea\nINTERÉS: X/10 | MOMENTUM: X/10 | POTENCIAL: X/10\n💬 3 RESPUESTAS listas para copiar — de más sutil a más directo\n⚠️ El error que NO puede cometer\n🎯 Próximo movimiento concreto`,
+    primer:`${p}ELLA: ${f.info||''}\nPLATAFORMA: ${f.plat||'Tinder'}\nTONO: ${f.tono||'ingenioso'}\n\n3 primeros mensajes que GENERAN respuesta sí o sí. Para cada uno:\n→ El mensaje exacto entre comillas\n→ Por qué funciona (1 línea)\nAl final: el error #1 que cometen todos`,
+    senales:`${p}SITUACIÓN: ${f.info||''}\nLa conoce hace: ${f.tiempo||'semanas'}\nContexto: ${f.ctx||'en persona'}\n\nVeredicto sin rodeos:\n🎯 LE GUSTÁS / NO LE GUSTÁS / INDEFINIDO — razón concreta en 2 líneas\n✅ Señales positivas reales (no autoengaño)\n🚩 Red flags que está ignorando\n⚡ Qué hacer en las próximas 48h exactamente\n💀 Qué NO hacer aunque muera de ganas`,
+    cita:`${p}ELLA: ${f.info||''}\nPresupuesto: ${f.pres||'medio'}\nTipo: ${f.tipo||'primera cita'}\nCiudad: ${f.ciudad||'no especificada'}\n\n🔥 CONCEPTO en 1 oración (por qué funciona psicológicamente)\n📍 Plan hora a hora con lugares específicos\n💬 Mensaje exacto para invitarla (copiar y pegar)\n⚡ 2 movimientos para crear tensión durante la cita\n🚪 Cómo cerrar la noche sin quedar como desesperado`,
+    ghosting:`${p}QUÉ PASÓ: ${f.ctx||''}\nHace cuánto: ${f.tiempo||'1 semana'}\nNivel: ${f.nivel||'salimos 1 vez'}\n\n🔍 Por qué ghosteó — la verdad, no lo que quiere escuchar\n💬 Mensaje A (sutil): entre comillas, listo para copiar\n💬 Mensaje B (directo): entre comillas, listo para copiar\n📊 % de chances reales de rescatarlo\n💀 Si no responde en X días, soltá. Por qué.`,
+    perfil:`${p}BIO Y FOTOS: ${f.bio||''}\nBusca: ${f.obj||'relación'}\nEdad: ${f.edad||'25-30'}\n\n💀 Los 3 errores que lo están matando (sin suavizarlo)\n✅ BIO NUEVA lista para copiar (máx 150 chars, que genere curiosidad)\n📸 Foto principal: qué poner y por qué\n🎯 El 1 cambio que más matches le va a dar esta semana`,
+    imagen:`${p}LOOK ACTUAL: ${f.desc||''}\nOcasión: ${f.oc||'cita'}\nQuiere mejorar: ${f.mejorar||'todo'}\n\n⭐ PUNTUACIÓN: X/10 — por qué en 2 líneas\n💀 Lo que lo está bajando puntos (sin filtros)\n✅ Lo que sí funciona, no lo tire\n👔 3 cambios concretos esta semana con precio estimado\n🔥 El look completo que lo transforma`,
+    coach:`${p}PREGUNTA: ${f.q||''}\n\n🎯 RESPUESTA DIRECTA — sin rodeos\n🧠 Por qué pasa esto realmente (psicología real, no clichés)\n⚡ Pasos concretos en orden de ejecución\n💊 La verdad incómoda que necesita escuchar`,
+    live:`${p}ESTOY EN LA CITA. PASÓ ESTO: ${f.txt||''}\n\nRespuesta INMEDIATA. Máximo 3 opciones ultra-cortas. Solo lo esencial para usar ahora. Sin análisis largo.`
   };
-  reader.readAsDataURL(file);
+  return prompts[id] || '';
 }
-function dropFoto(e){
-  e.preventDefault();
-  const dz=document.getElementById('dz');if(dz)dz.classList.remove('drag');
-  const file=e.dataTransfer.files[0];
-  if(file&&file.type.startsWith('image/')){
-    const dt=new DataTransfer();dt.items.add(file);
-    const inp=document.getElementById('foto-file');if(inp){inp.files=dt.files;loadFoto(inp);}
+
+/* ════════════════════════════════════════════
+   UI STATE
+════════════════════════════════════════════ */
+let currentTool = null;
+let deferredInstall = null;
+
+function show(id) {
+  ['screen-onboard','screen-home','screen-panel','screen-hist'].forEach(s=>{
+    document.getElementById(s).style.display = s===id ? 'flex' : 'none';
+  });
+  if (id==='screen-home') {
+    // make home scrollable
+    document.getElementById('screen-home').style.display = 'block';
   }
 }
-function clearFoto(e){
-  e.stopPropagation();
-  imgBase64=null;imgMime=null;
-  const inp=document.getElementById('foto-file');if(inp)inp.value='';
-  const ph=document.getElementById('dz-ph');
-  const prev=document.getElementById('foto-prev');
-  if(ph)ph.style.display='block';
-  if(prev)prev.style.display='none';
+
+function setNavOn(id) {
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const el = document.getElementById('ni-'+id);
+  if (el) el.classList.add('on');
 }
 
-/* ═══════════════════════════════════
-   AUDIO RECORDER
-═══════════════════════════════════ */
-async function startRec(){
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRec=new MediaRecorder(stream);audioChunks=[];recSecs=0;
-    mediaRec.ondataavailable=e=>audioChunks.push(e.data);
-    mediaRec.onstop=()=>{
-      stream.getTracks().forEach(t=>t.stop());clearInterval(recInterval);
-      document.getElementById('audio-recording').style.display='none';
-      document.getElementById('audio-done').style.display='block';
-      const prev=document.getElementById('audio-preview');
-      if(prev)prev.textContent='Grabación lista ('+recSecs+' seg). Describí lo que dijiste abajo.';
-    };
-    mediaRec.start();
-    document.getElementById('audio-idle').style.display='none';
-    document.getElementById('audio-recording').style.display='block';
-    recInterval=setInterval(()=>{recSecs++;const t=document.getElementById('rec-timer');if(t)t.textContent=recSecs+' seg';if(recSecs>=60)stopRec();},1000);
-  }catch(e){showToast('No se pudo acceder al micrófono','⚠️');}
-}
-function stopRec(){if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();clearInterval(recInterval);}
-function resetAudio(){
-  const idle=document.getElementById('audio-idle'),rec=document.getElementById('audio-recording'),done=document.getElementById('audio-done');
-  if(idle)idle.style.display='block';if(rec)rec.style.display='none';if(done)done.style.display='none';
-  const t=document.getElementById('t-audio');if(t)t.value='';
+function goHome() {
+  show('screen-home');
+  setNavOn('home');
+  currentTool = null;
 }
 
-/* ═══════════════════════════════════
-   HISTORY
-═══════════════════════════════════ */
-function saveHist(tool,text){
-  try{
-    const h=JSON.parse(localStorage.getItem('wm_hist')||'[]');
-    h.unshift({tool,preview:text.substring(0,180),full:text,date:new Date().toLocaleDateString('es-AR'),ts:Date.now()});
-    if(h.length>40)h.pop();
-    localStorage.setItem('wm_hist',JSON.stringify(h));
-  }catch(e){}
+function showHist() {
+  renderHist();
+  show('screen-hist');
+  setNavOn('hist');
 }
 
-function renderHistList(containerId){
-  const el=document.getElementById(containerId);if(!el)return;
-  const hist=JSON.parse(localStorage.getItem('wm_hist')||'[]');
-  if(!hist.length){
-    el.innerHTML='<div class="hist-empty"><div class="he-icon">📭</div><p>Todavía no tenés análisis guardados.<br>Usá las herramientas y aparecerán acá.</p></div>';
+/* ════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  const msg_el = document.getElementById('toast-msg');
+  msg_el.textContent = msg;
+  el.className = 'on ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.className='', 3200);
+}
+
+/* ════════════════════════════════════════════
+   GREET
+════════════════════════════════════════════ */
+function updateGreet() {
+  const h = new Date().getHours();
+  const g = h<12 ? 'Buenos días' : h<18 ? 'Buenas tardes' : 'Buenas noches';
+  document.getElementById('greet-txt').textContent = g;
+}
+
+/* ════════════════════════════════════════════
+   TOOL GRID
+════════════════════════════════════════════ */
+function buildGrid() {
+  const grid = document.getElementById('tool-grid');
+  grid.innerHTML = TOOLS.map(t => `
+    <div class="tool-card" onclick="openTool('${t.id}')">
+      <span class="tc-icon">${t.icon}</span>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-desc">${t.desc}</div>
+    </div>
+  `).join('');
+}
+
+/* ════════════════════════════════════════════
+   OPEN TOOL
+════════════════════════════════════════════ */
+function openTool(id) {
+  currentTool = id;
+  const tool = TOOLS.find(t=>t.id===id) || { icon:'⚡', name:'CITA EN VIVO' };
+  document.getElementById('panel-title-txt').textContent = `${tool.icon} ${tool.name}`;
+  renderPanel(id);
+  show('screen-panel');
+  setNavOn(id==='chat'?'chat':id==='coach'?'coach':'home');
+  document.getElementById('panel-scroll').scrollTop = 0;
+}
+
+/* ════════════════════════════════════════════
+   RENDER HELPERS
+════════════════════════════════════════════ */
+function field(label, content, opt='') {
+  return `<div class="field"><label class="field-label">${label}${opt?`<span>${opt}</span>`:''}</label>${content}</div>`;
+}
+function g2(...fields) {
+  return `<div class="g2">${fields.join('')}</div>`;
+}
+function seg(id, opts, defVal) {
+  const btns = opts.map((o,i)=>`<button class="seg-btn${i===0?' on':''}" data-seg="${id}" onclick="segClick(this,'${id}')">${o}</button>`).join('');
+  // set default
+  setTimeout(()=>{
+    const first = document.querySelector(`[data-seg="${id}"].on`);
+    if (first && defVal) {
+      document.querySelectorAll(`[data-seg="${id}"]`).forEach(b=>{
+        b.classList.toggle('on', b.textContent===defVal);
+      });
+    }
+  }, 50);
+  return `<div class="seg-group">${btns}</div>`;
+}
+function segVal(id) {
+  return document.querySelector(`[data-seg="${id}"].on`)?.textContent || '';
+}
+function chips(id, opts, defVals=[]) {
+  return `<div class="chips-wrap" id="chips-${id}">${opts.map(o=>`<button class="chip${defVals.includes(o)?' on':''}" onclick="chipClick(this,'${id}')">${o}</button>`).join('')}</div>`;
+}
+function chipsVal(id) {
+  return [...document.querySelectorAll(`#chips-${id} .chip.on`)].map(b=>b.textContent).join(', ');
+}
+function ctaBtn(label, onclick, cls='') {
+  return `<button class="cta-btn ${cls}" onclick="${onclick}">${label}</button>`;
+}
+function loaderHTML(msg) {
+  return `<div class="loader-wrap"><div class="spinner"></div><span class="loader-txt">${msg}</span></div>`;
+}
+function resCardHTML(label, body, retryFn='', cls='', topCls='', labelCls='') {
+  const resCopy = `navigator.clipboard.writeText(document.getElementById('res-body-${currentTool}').textContent).then(()=>showToast('Copiado ✓'))`;
+  return `
+    <div class="res-card ${cls}">
+      <div class="res-top ${topCls}">
+        <span class="res-label ${labelCls}">${label}</span>
+        <div class="res-acts">
+          <button class="btn-act" onclick="${resCopy}">Copiar</button>
+          ${retryFn?`<button class="btn-act" onclick="${retryFn}">↺ Otra</button>`:''}
+        </div>
+      </div>
+      <div class="res-body" id="res-body-${currentTool}">${body}</div>
+    </div>`;
+}
+
+function segClick(el, id) {
+  document.querySelectorAll(`[data-seg="${id}"]`).forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+function chipClick(el, id) {
+  el.classList.toggle('on');
+}
+
+/* ════════════════════════════════════════════
+   PANEL RENDERER
+════════════════════════════════════════════ */
+function renderPanel(id) {
+  const body = document.getElementById('panel-body');
+  const panels = {
+
+    chat: ()=> `
+      ${field('Pegá el chat completo', `<textarea id="t-chat" rows="7" placeholder="Ella: hola!\nYo: hola linda\nElla: jaja qué tal…" style="min-height:160px;font-size:1rem"></textarea>`)}
+      ${g2(
+        field('Objetivo', `<select id="s-chat-obj"><option>¿Qué respondo?</option><option>Invitarla a salir</option><option>Pedirle el número</option><option>Crear tensión</option><option>Arreglar una cagada</option><option>Retomar conversación fría</option></select>`),
+        field('Mi tono', `<select id="s-chat-tono"><option>Directo</option><option>Divertido</option><option>Misterioso</option><option>Romántico</option><option>Picante</option></select>`)
+      )}
+      <div class="field"><label class="field-label">Intensidad</label>${seg('chat-int',['Sutil','Equilibrado','Al hueso'],'Equilibrado')}</div>
+      ${ctaBtn('💬 ANALIZÁ ESTO', "runTool('chat')")}
+      <div id="result-chat"></div>`,
+
+    primer: ()=> `
+      ${field('¿Quién es ella? ¿Cómo la conociste?', `<textarea id="t-primer" rows="4" placeholder="La vi en Tinder. Fotos viajando, parece creativa, tiene perro, trabaja en diseño…"></textarea>`)}
+      ${g2(
+        field('Plataforma', `<select id="s-primer-plat"><option>Tinder</option><option>Bumble</option><option>Instagram DM</option><option>WhatsApp</option><option>La conocí en persona</option></select>`),
+        field('Tono', `<select id="s-primer-tono"><option>Ingenioso</option><option>Directo y confiado</option><option>Pregunta curiosa</option><option>Provocador</option><option>Cumplido real</option></select>`)
+      )}
+      ${ctaBtn('🎯 GENERÁ LOS MENSAJES', "runTool('primer')")}
+      <div id="result-primer"></div>`,
+
+    senales: ()=> `
+      ${field('Describí toda la situación sin omitir nada', `<textarea id="t-senales" rows="6" placeholder="Nos conocimos en el gym. Siempre me sonríe, a veces me toca el brazo. Pero cuando la invité dijo que estaba ocupada…"></textarea>`)}
+      ${g2(
+        field('La conoce hace', `<select id="s-sen-t"><option>Pocos días</option><option>Semanas</option><option>Meses</option><option>Mucho tiempo</option><option>Es ex</option></select>`),
+        field('Contexto', `<select id="s-sen-c"><option>En persona</option><option>App de citas</option><option>Trabajo/estudio</option><option>Amigos en común</option><option>Redes sociales</option></select>`)
+      )}
+      ${ctaBtn('🔍 DECIME LA VERDAD', "runTool('senales')")}
+      <div id="result-senales"></div>`,
+
+    cita: ()=> `
+      ${field('¿Cómo es ella? Personalidad, gustos', `<textarea id="t-cita" rows="4" placeholder="Extrovertida, le gusta el arte y la noche, trabaja en marketing, tiene humor ácido…"></textarea>`)}
+      ${field('Ciudad / zona', `<input id="t-cita-ciudad" placeholder="Tucumán, Buenos Aires, Córdoba…"/>`, '(opcional)')}
+      ${g2(
+        field('Presupuesto', `<select id="s-cita-pres"><option>Bajo (menos de $15)</option><option>Medio ($15-50)</option><option>Alto ($50+)</option><option>Sin límite</option></select>`),
+        field('Tipo de cita', `<select id="s-cita-tipo"><option>Primera cita</option><option>Segunda cita</option><option>Ya salimos varias veces</option><option>Reconciliación</option></select>`)
+      )}
+      ${ctaBtn('🔥 DISEÑÁ LA CITA', "runTool('cita')")}
+      <div id="result-cita"></div>`,
+
+    ghosting: ()=> `
+      ${field('¿Qué pasó antes de que desapareciera?', `<textarea id="t-ghost" rows="5" placeholder="Hablamos increíble por 2 semanas, salimos, parecía re bien, le mandé mensaje y nada…"></textarea>`)}
+      ${g2(
+        field('Tiempo sin respuesta', `<select id="s-ghost-t"><option>2-3 días</option><option>1 semana</option><option>2 semanas</option><option>1 mes</option><option>Más de 1 mes</option></select>`),
+        field('Nivel de la relación', `<select id="s-ghost-n"><option>Solo hablamos online</option><option>Salimos 1 vez</option><option>Varias citas</option><option>Era algo serio</option></select>`)
+      )}
+      ${ctaBtn('👻 QUÉ HAGO AHORA', "runTool('ghosting')")}
+      <div id="result-ghosting"></div>`,
+
+    perfil: ()=> `
+      ${field('Bio actual + describí tus fotos', `<textarea id="t-perfil" rows="5" placeholder="Bio: 'Ingeniero, 28. Me gusta el fútbol.'\nFotos: selfie en casa, foto grupal, foto en el gym…"></textarea>`)}
+      ${g2(
+        field('Buscás', `<select id="s-perfil-obj"><option>Relación seria</option><option>Conocer personas</option><option>Salidas y diversión</option><option>Lo que surja</option></select>`),
+        field('Tu edad', `<select id="s-perfil-edad"><option>18-24</option><option>25-30</option><option>31-38</option><option>38+</option></select>`)
+      )}
+      ${ctaBtn('📱 AUDITÁ MI PERFIL', "runTool('perfil')")}
+      <div id="result-perfil"></div>`,
+
+    imagen: ()=> `
+      ${field('Describí tu look actual (ropa, corte, barba, etc.)', `<textarea id="t-imagen" rows="4" placeholder="Jean azul recto, remera blanca básica, Nike blancas, pelo corto, barba de 3 días…"></textarea>`)}
+      ${field('Ocasión', `<select id="s-imagen-oc"><option>Primera cita</option><option>Salida nocturna</option><option>Foto de perfil</option><option>Día a día</option><option>Evento importante</option></select>`)}
+      ${field('Qué querés mejorar', chips('imagen-mejora', ['Look general','Ropa','Colores','Corte de pelo','Barba','Calzado','Accesorios'], ['Look general']))}
+      ${ctaBtn('💪 ANALIZÁ MI IMAGEN', "runTool('imagen')")}
+      <div id="result-imagen"></div>`,
+
+    coach: ()=> {
+      const quick = ['¿Cómo salir de la friendzone?','Me pone en visto siempre','¿Cuándo proponer salir?','Cómo crear atracción real','Siempre quedo como el amigo','Me pongo nervioso con las minas','Mi ex me escribió de nuevo','Cómo mejorar mi autoconfianza','Ella dice que no está lista','¿Le sigo o me alejo?'];
+      return `
+        ${field('Preguntá lo que sea — respuesta cruda garantizada', `<textarea id="t-coach" rows="4" placeholder="¿Por qué siempre me ghostean? ¿Cómo sé si le gusto de verdad?…"></textarea>`)}
+        <div class="field">
+          <div class="quick-label">Preguntas frecuentes</div>
+          <div class="chips-wrap">${quick.map(q=>`<button class="chip" onclick="document.getElementById('t-coach').value=this.textContent;this.closest('.chips-wrap').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${q}</button>`).join('')}</div>
+        </div>
+        ${ctaBtn('🧠 DECIME LA VERDAD', "runTool('coach')")}
+        <div id="result-coach"></div>`;
+    },
+
+    live: ()=> {
+      const quick = ['Silencio incómodo — qué digo','Mencionó a su ex','Me preguntó qué busco','Quiero proponer la segunda cita','La cita va bien, ¿cuándo la beso?','Dijo que tiene novio','Parece aburrida'];
+      return `
+        <div style="background:rgba(230,53,53,.07);border:1px solid rgba(230,53,53,.25);border-radius:12px;padding:15px 17px;margin-bottom:22px;font-size:.95rem;color:var(--gray);line-height:1.6">
+          ⚡ <strong style="color:var(--red2)">Modo rápido.</strong> Escribí en 1 línea qué pasó. Respuesta directa en segundos.
+        </div>
+        <div class="field">
+          <div class="chips-wrap">${quick.map(q=>`<button class="chip" onclick="document.getElementById('t-live').value=this.textContent;this.closest('.chips-wrap').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));this.classList.add('on')">${q}</button>`).join('')}</div>
+        </div>
+        ${field('¿Qué pasó ahora mismo?', `<textarea id="t-live" rows="3" placeholder="Acaba de decir que nunca tuvo una cita así…"></textarea>`)}
+        ${ctaBtn('⚡ RESPUESTA YA', "runTool('live')", 'live')}
+        <div id="result-live"></div>`;
+    }
+  };
+
+  body.innerHTML = panels[id] ? panels[id]() : '<p>Herramienta no encontrada.</p>';
+}
+
+/* ════════════════════════════════════════════
+   RUN TOOL
+════════════════════════════════════════════ */
+async function runTool(id) {
+  const resultEl = document.getElementById(`result-${id}`);
+  if (!resultEl) return;
+
+  // collect fields
+  const f = {};
+  const get = (sel) => { const el = document.querySelector(sel); return el?.value?.trim()||''; };
+
+  if (id==='chat')    { f.chat=get('#t-chat'); f.obj=get('#s-chat-obj'); f.tono=get('#s-chat-tono'); f.int=segVal('chat-int'); if(!f.chat){showToast('Pegá el chat primero','err');return;} }
+  if (id==='primer')  { f.info=get('#t-primer'); f.plat=get('#s-primer-plat'); f.tono=get('#s-primer-tono'); if(!f.info){showToast('Describí a ella primero','err');return;} }
+  if (id==='senales') { f.info=get('#t-senales'); f.tiempo=get('#s-sen-t'); f.ctx=get('#s-sen-c'); if(!f.info){showToast('Describí la situación','err');return;} }
+  if (id==='cita')    { f.info=get('#t-cita'); f.ciudad=get('#t-cita-ciudad'); f.pres=get('#s-cita-pres'); f.tipo=get('#s-cita-tipo'); if(!f.info){showToast('Describí a ella primero','err');return;} }
+  if (id==='ghosting'){ f.ctx=get('#t-ghost'); f.tiempo=get('#s-ghost-t'); f.nivel=get('#s-ghost-n'); if(!f.ctx){showToast('Describí qué pasó','err');return;} }
+  if (id==='perfil')  { f.bio=get('#t-perfil'); f.obj=get('#s-perfil-obj'); f.edad=get('#s-perfil-edad'); if(!f.bio){showToast('Describí tu perfil','err');return;} }
+  if (id==='imagen')  { f.desc=get('#t-imagen'); f.oc=get('#s-imagen-oc'); f.mejorar=chipsVal('imagen-mejora'); if(!f.desc){showToast('Describí tu look','err');return;} }
+  if (id==='coach')   { f.q=get('#t-coach'); if(!f.q){showToast('Escribí tu pregunta','err');return;} }
+  if (id==='live')    { f.txt=get('#t-live'); if(!f.txt){showToast('Describí qué pasó','err');return;} }
+
+  const toolNames = { chat:'Análisis Chat', primer:'Primer Mensaje', senales:'Señales', cita:'Cita', ghosting:'Anti-Ghosting', perfil:'Perfil', imagen:'Imagen', coach:'Coach', live:'Cita en Vivo' };
+  const loaderMsgs = { chat:'Leyendo el chat…', primer:'Creando mensajes…', senales:'Analizando señales…', cita:'Diseñando la cita…', ghosting:'Evaluando la situación…', perfil:'Auditando el perfil…', imagen:'Analizando tu imagen…', coach:'Preparando respuesta cruda…', live:'Procesando…' };
+
+  resultEl.innerHTML = loaderHTML(loaderMsgs[id]||'Procesando…');
+
+  // disable btn
+  const btn = document.querySelector(`#panel-body .cta-btn`);
+  if (btn) btn.disabled = true;
+
+  try {
+    const prompt = buildPrompt(id, f);
+    const result = await callGroq(prompt);
+
+    // Save to history
+    saveHist(toolNames[id]||id, result);
+
+    // Score extraction for chat
+    let scoreHTML = '';
+    if (id==='chat') {
+      const iM = result.match(/interés[:\s]*(\d+)/i);
+      const mM = result.match(/momentum[:\s]*(\d+)/i);
+      const pM = result.match(/potencial[:\s]*(\d+)/i);
+      if (iM||mM||pM) {
+        const iv = iM?Math.min(+iM[1],10):0, mv=mM?Math.min(+mM[1],10):0, pv=pM?Math.min(+pM[1],10):0;
+        scoreHTML = `
+          <div class="score-wrap">
+            <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;letter-spacing:.08em;color:var(--amber2);margin-bottom:4px">📊 SCORE DEL CHAT</div>
+            <div class="score-bars">
+              ${[['Interés',iv],['Momentum',mv],['Potencial',pv]].map(([l,v])=>`
+                <div class="sbar-row">
+                  <span class="sbar-label">${l}</span>
+                  <div class="sbar-track"><div class="sbar-fill" style="width:${v*10}%"></div></div>
+                  <span class="sbar-val">${v}</span>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }
+    }
+
+    const isLive = id==='live';
+    resultEl.innerHTML = scoreHTML + resCardHTML(
+      isLive ? '⚡ HACÉ ESTO AHORA' : '📋 RESULTADO',
+      escapeHtml(result).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'),
+      `runTool('${id}')`,
+      isLive?'red-accent':'',
+      isLive?'amber':'',
+      isLive?'amber':''
+    );
+
+    // set ID for copy
+    const rb = resultEl.querySelector('.res-body');
+    if (rb) rb.id = `res-body-${id}`;
+
+    showToast('Listo ✓');
+  } catch(e) {
+    resultEl.innerHTML = `<div style="padding:18px;background:rgba(230,53,53,.07);border:1px solid rgba(230,53,53,.3);border-radius:12px;color:var(--red2);font-size:.95rem;line-height:1.6">
+      <strong>Error:</strong> ${e.message}<br/><br/>
+
+    </div>`;
+  }
+
+  if (btn) btn.disabled = false;
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ════════════════════════════════════════════
+   HISTORIAL
+════════════════════════════════════════════ */
+function saveHist(tool, text) {
+  try {
+    const h = JSON.parse(localStorage.getItem('wm_hist')||'[]');
+    h.unshift({ tool, text: text.substring(0,300), date: new Date().toLocaleDateString('es-AR'), ts: Date.now() });
+    if (h.length>40) h.pop();
+    localStorage.setItem('wm_hist', JSON.stringify(h));
+  } catch(e) {}
+}
+
+function renderHist() {
+  const body = document.getElementById('hist-body');
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('wm_hist')||'[]'); } catch(e){}
+  if (!hist.length) {
+    body.innerHTML = `<div class="hist-empty"><div class="icon">📭</div><p>No hay nada guardado todavía.</p></div>`;
     return;
   }
-  el.innerHTML=hist.map((h,i)=>`
+  body.innerHTML = hist.map((h,i)=>`
     <div class="hist-item">
-      <div class="hist-item-top">
+      <div class="hist-meta">
         <span class="hist-tool">${h.tool}</span>
-        <span style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px">
           <span class="hist-date">${h.date}</span>
-          <button class="hist-del" onclick="delHist(${i},'${containerId}')">✕</button>
-        </span>
+          <button class="hist-del" onclick="delHist(${i})">✕</button>
+        </div>
       </div>
-      <div class="hist-preview">${h.preview}…</div>
+      <div class="hist-preview">${escapeHtml(h.text)}</div>
     </div>`).join('');
 }
 
-function delHist(i,containerId){
-  const h=JSON.parse(localStorage.getItem('wm_hist')||'[]');
-  h.splice(i,1);localStorage.setItem('wm_hist',JSON.stringify(h));
-  renderHistList(containerId);showToast('Eliminado','🗑️');
+function delHist(i) {
+  try {
+    const h = JSON.parse(localStorage.getItem('wm_hist')||'[]');
+    h.splice(i,1);
+    localStorage.setItem('wm_hist', JSON.stringify(h));
+    renderHist();
+  } catch(e){}
 }
 
-/* ═══════════════════════════════════
-   STREAMING
-═══════════════════════════════════ */
-async function streamText(el,text,delay=10){
-  el.textContent='';
-  const cursor=document.createElement('span');cursor.className='stream-cursor';el.appendChild(cursor);
-  for(const ch of text){
-    const tn=document.createTextNode(ch);el.insertBefore(tn,cursor);
-    await new Promise(r=>setTimeout(r,delay));
-  }
-  cursor.remove();
-}
 
-/* ═══════════════════════════════════
-   SCORE METER
-═══════════════════════════════════ */
-function showScore(i,m,p){
-  const total=Math.round((i+m+p)/3);
-  const el=document.getElementById('score-chat');if(!el)return;
-  el.style.display='block';
-  setTimeout(()=>{
-    const ring=document.getElementById('score-chat-ring');
-    if(ring)ring.style.strokeDashoffset=188-(188*total/10);
-    const num=document.getElementById('score-chat-num');if(num)num.textContent=total;
-    const labels=['Fría ❄️','Tibia 🌡️','Tibia 🌡️','Tibia 🌡️','Tibia 🌡️','Interesada 🔥','Interesada 🔥','Muy interesada 🔥','Caliente 💥','Caliente 💥','Muy caliente 💥'];
-    const lbl=document.getElementById('score-chat-label');if(lbl)lbl.textContent=labels[total]||'';
-    [['sb-interes','sv-interes',i],['sb-momentum','sv-momentum',m],['sb-potencial','sv-potencial',p]].forEach(([bid,vid,val])=>{
-      setTimeout(()=>{
-        const b=document.getElementById(bid);if(b)b.style.width=(val*10)+'%';
-        const v=document.getElementById(vid);if(v)v.textContent=val;
-      },200);
-    });
-  },100);
-}
+/* ════════════════════════════════════════════
+   ONBOARDING
+════════════════════════════════════════════ */
+let obStep = 0;
 
-function extractScores(text){
-  const iM=text.match(/inter[eé]s[:\s]*(\d+)/i);
-  const mM=text.match(/momentum[:\s]*(\d+)/i);
-  const pM=text.match(/potencial[:\s]*(\d+)/i);
-  return{
-    interes:Math.min(iM?parseInt(iM[1]):Math.floor(Math.random()*3)+5,10),
-    momentum:Math.min(mM?parseInt(mM[1]):Math.floor(Math.random()*3)+4,10),
-    potencial:Math.min(pM?parseInt(pM[1]):Math.floor(Math.random()*3)+5,10)
-  };
-}
-
-/* ═══════════════════════════════════
-   API
-═══════════════════════════════════ */
-const SYSTEM=`Sos WingmanAI, coach de conquista honesto y efectivo.
-Ayudás a hombres a comunicarse mejor y conectar genuinamente con mujeres.
-VALORES: Autenticidad, respeto y comunicación honesta. NUNCA manipulación ni engaño.
-ESTILO: Español rioplatense (tuteo). Directo como un amigo que dice la verdad. Emojis con moderación.
-FORMATO: Secciones claras con emojis. Para conversaciones incluí siempre INTERÉS: X/10, MOMENTUM: X/10 y POTENCIAL: X/10.`;
-
-const SYS_IMG=`Sos asesor de imagen masculino de alto nivel, honesto y práctico.
-ESTILO: Español rioplatense. Directo, constructivo. Siempre incluí sugerencias de compra con precios estimados.
-FORMATO: Empieza con puntuación X/10. Secciones claras. Terminá con look definitivo completo.`;
-
-const GEMINI_KEY='AIzaSyCnq6xr_ZQ1QV6NHCWCUUfU_RF89C9lshM';
-const GEMINI_URL='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
-
-async function callAPI(messages, sys){
-  const contents = messages.map(m=>({
-    role: m.role==='assistant'?'model':'user',
-    parts:[{text: m.content}]
-  }));
-  const resp = await fetch(GEMINI_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      system_instruction:{parts:[{text:sys}]},
-      contents,
-      generationConfig:{maxOutputTokens:1200,temperature:0.85}
-    })
-  });
-  if(!resp.ok){
-    const err=await resp.json().catch(()=>({}));
-    throw new Error(err.error?.message||'Error HTTP '+resp.status);
-  }
-  const data=await resp.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text||'Sin respuesta.';
-}
-
-/* ═══════════════════════════════════
-   BUILD PROMPTS
-═══════════════════════════════════ */
-function buildPrompt(id){
-  const g=id=>document.getElementById(id);
-  const v=id=>{const e=g(id);return e?e.value.trim():'';}
-  const segVal=id=>{const e=g(id);return e?e.querySelector('.seg-b.on')?.textContent||'':'';}
-
-  if(id==='emergencia') return v('t-emergencia')?`SITUACIÓN URGENTE: ${v('t-emergencia')}\n\nDame 3 respuestas cortas, directas, listas para copiar. Sin análisis largo.`:null;
-
-  if(id==='chat'){
-    const chat=v('t-chat');if(!chat)return null;
-    return`CHAT:\n${chat}\nOBJETIVO: ${v('s-chat-obj')}\nESTILO: ${v('s-chat-est')}\nINTENSIDAD: ${segVal('seg-chat')}\n\n🧠 ANÁLISIS RÁPIDO\n📊 TEMPERATURA\nINTERÉS: X/10\nMOMENTUM: X/10\nPOTENCIAL: X/10\n💬 RESPUESTAS SUGERIDAS (2-3 listas para copiar)\n⚠️ QUÉ EVITAR\n🎯 PRÓXIMO PASO`;
-  }
-  if(id==='primer'){
-    const info=v('t-primer');if(!info)return null;
-    return`CONTEXTO: ${info}\nTONO: ${v('s-primer-tono')}\nPLATAFORMA: ${v('s-primer-plat')}\nCANTIDAD: ${segVal('seg-primer')}\n\nMensajes únicos y específicos. Para cada uno: texto exacto + por qué funciona + cuándo usarlo.`;
-  }
-  if(id==='perfil'){const b=v('t-perfil');if(!b)return null;return`PERFIL: ${b}\nBUSCO: ${v('s-perfil-obj')}\nEDAD: ${v('s-perfil-edad')}\n\n📊 PUNTUACIÓN X/10\n❌ 3 ERRORES PRINCIPALES\n✅ BIO MEJORADA lista para copiar\n📸 CONSEJOS DE FOTOS\n🚀 2 CAMBIOS DE MAYOR IMPACTO`;}
-  if(id==='cita'){const i=v('t-cita');if(!i)return null;return`ELLA: ${i}\nPRESUPUESTO: ${v('s-cita-pres')}\nTIPO: ${v('s-cita-num')}\nCIUDAD: ${v('t-cita-ciudad')||'no especificada'}\n\n🎯 CONCEPTO\n📍 PLAN COMPLETO con timing\n💬 MENSAJE PARA INVITARLA\n⚡ 3 TIPS\n🔄 PLAN B`;}
-  if(id==='senales'){const i=v('t-senales');if(!i)return null;return`SITUACIÓN: ${i}\nTIEMPO: ${v('s-sen-t')}\nCONTEXTO: ${v('s-sen-c')}\n\n🎯 VEREDICTO (Le gustás / No / Indefinido)\n✅ SEÑALES POSITIVAS\n🚩 RED FLAGS\n⚡ QUÉ HACER AHORA\n❌ QUÉ NO HACER`;}
-  if(id==='ghosting'){const c=v('t-ghosting');if(!c)return null;return`QUÉ PASÓ: ${c}\nTIEMPO: ${v('s-ghost-t')}\nNIVEL: ${v('s-ghost-n')}\n\n📊 DIAGNÓSTICO\n💬 MENSAJE OPCIÓN 1 (sutil)\n💬 MENSAJE OPCIÓN 2 (directo)\n⚠️ QUÉ NO HACER\n🎯 SI NO RESPONDE`;}
-  if(id==='compat'){const yo=v('t-yo'),ella=v('t-ella');if(!yo||!ella)return null;return`YO: ${yo}\nELLA: ${ella}\n\n💘 PUNTUACIÓN X/10\n✅ FORTALEZAS\n⚡ PUNTOS DE TENSIÓN\n🧠 PERSPECTIVA\n🎯 PRONÓSTICO\n💡 CONSEJO CLAVE`;}
-  if(id==='coach'){const q=v('t-coach');if(!q)return null;return`${q}\n\n🎯 RESPUESTA DIRECTA\n🧠 EL PORQUÉ\n⚡ PASOS CONCRETOS\n💡 LA VERDAD INCÓMODA`;}
-  if(id==='audio'){const s=v('t-audio');if(!s)return null;return`SITUACIÓN (descripta por voz): ${s}\n\n🧠 ANÁLISIS\n🎯 QUÉ HACER AHORA\n💬 MENSAJE O RESPUESTA EXACTA\n⚠️ QUÉ EVITAR`;}
-  if(id==='live'){const s=v('t-live');if(!s)return null;return`Estoy EN UNA CITA ahora. LO QUE PASÓ: ${s}\n\nDame SOLO 2-3 respuestas MUY CORTAS, directas, listas para decir. Sin explicaciones largas.`;}
-  return null;
-}
-
-/* ═══════════════════════════════════
-   RUN TOOL
-═══════════════════════════════════ */
-const TOOL_NAMES={chat:'Analizar Chat',primer:'Primer Mensaje',perfil:'Perfil',
-  cita:'Cita Perfecta',senales:'Señales',ghosting:'Anti-Ghosting',compat:'Compatibilidad',
-  coach:'Coach Personal',emergencia:'Emergencia',imagen:'Asesor de Imagen',audio:'Análisis por Voz',live:'Cita en Vivo'};
-
-async function runTool(id){
-  const prompt=buildPrompt(id);
-  if(!prompt){showToast('Completá el campo requerido','⚠️');return;}
-
-  const sk=document.getElementById('sk-'+id);
-  const resCard=document.getElementById('res-'+id);
-  const resBody=document.getElementById('res-'+id+'-body');
-  if(!resBody){showToast('Error interno','⚠️');return;}
-
-  if(sk)sk.classList.add('on');
-  if(resCard)resCard.classList.remove('on');
-  resBody.textContent='';
-
-  const btn=document.querySelector(`button[onclick="runTool('${id}')"]`);
-  if(btn)btn.disabled=true;
-
-  try{
-    const result=await callAPI([{role:'user',content:prompt}],SYSTEM);
-    if(sk)sk.classList.remove('on');
-    if(resCard)resCard.classList.add('on');
-    if(resCard)resCard.scrollIntoView({behavior:'smooth',block:'nearest'});
-    await streamText(resBody,result,10);
-    if(id==='chat'){const s=extractScores(result);showScore(s.interes,s.momentum,s.potencial);}
-    if(navigator.vibrate)navigator.vibrate([25,8,15]);
-    saveHist(TOOL_NAMES[id]||id,result);
-  }catch(err){
-    if(sk)sk.classList.remove('on');
-    if(resCard)resCard.classList.add('on');
-    resBody.textContent='❌ Error: '+err.message+'\n\nVerificá que la API key sea válida y que tenés conexión.';
-    console.error('API error:',err);
-  }finally{
-    if(btn)btn.disabled=false;
-  }
-}
-
-async function runImagen(){
-  const sk=document.getElementById('sk-imagen');
-  const resCard=document.getElementById('res-imagen');
-  const resBody=document.getElementById('res-imagen-body');
-  if(!resBody)return;
-
-  const modo=document.querySelector('#seg-img .seg-b.on')?.textContent||'';
-  const desc=document.getElementById('t-imagen')?.value.trim()||'';
-  const tieneFoto=(modo.includes('📸')||modo.includes('🔀'))&&imgBase64;
-  if(!desc&&!tieneFoto){showToast('Subí una foto o describí tu outfit','⚠️');return;}
-
-  if(sk)sk.classList.add('on');
-  if(resCard)resCard.classList.remove('on');
-  resBody.textContent='';
-
-  const chips=Array.from(document.querySelectorAll('#chips-img .chip.on')).map(c=>c.textContent).join(', ');
-  const prompt=`${desc?'OUTFIT: '+desc+'\n':''}OCASIÓN: ${document.getElementById('s-img-oc')?.value||''}\nESTILO OBJETIVO: ${document.getElementById('s-img-est')?.value||''}\nMEJORAR: ${chips||'look general'}\n\n⭐ PUNTUACIÓN X/10\n✅ LO QUE FUNCIONA\n❌ LO QUE CAMBIARÍA\n👔 OUTFIT IDEAL\n🎨 PALETA DE COLORES\n💇 GROOMING\n🛒 3 PIEZAS CLAVE con precio estimado\n🔥 LOOK DEFINITIVO completo`;
-
-  try{
-    let messages;
-    if(tieneFoto){
-      messages=[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:imgMime||'image/jpeg',data:imgBase64}},
-        {type:'text',text:prompt}
-      ]}];
-    }else{
-      messages=[{role:'user',content:prompt}];
+function renderOnboard(step) {
+  const el = document.getElementById('screen-onboard');
+  const steps = [
+    {
+      badge: 'El coach que dice la verdad',
+      h: `¿CANSADO<br/>DE TEORÍAS <em>INÚTILES?</em>`,
+      sub: 'Consejos reales de alguien con experiencia. Directo, sin suavizarlo, sin vueltas.',
+      content: `
+        <div class="ob-example">
+          <div class="ob-ex-label">Ejemplo de respuesta real</div>
+          <div class="ob-ex-body">
+            <strong>🌡️ Temperatura: CALIENTE</strong><br/>
+            Responde rápido, usa tu nombre, hace preguntas. Está interesada.<br/><br/>
+            <strong>💬 Mandá esto ahora:</strong><br/>
+            <span class="highlight">«Hablando de eso… ¿tomás algo el jueves?»</span>
+          </div>
+        </div>
+        <div class="ob-stats">
+          <div class="ob-stat"><div class="n">12K</div><div class="l">Usuarios</div></div>
+          <div class="ob-stat"><div class="n">94%</div><div class="l">Respuestas</div></div>
+          <div class="ob-stat"><div class="n">4.9★</div><div class="l">Rating</div></div>
+        </div>
+        <button class="cta-btn" onclick="nextObStep()">EMPEZAR →</button>
+        <span class="ob-skip" onclick="enterApp({})">Ya tengo cuenta</span>`
+    },
+    {
+      badge: 'Personalización',
+      h: `CONTAME<br/><em>QUIÉN SOS</em>`,
+      sub: 'Para que los consejos apliquen a tu situación real, no genéricos.',
+      content: `
+        <div class="ob-form">
+          <div class="field"><label class="field-label">Edad</label>
+            <select id="ob-edad"><option value="">Seleccionar…</option><option>18-24</option><option>25-30</option><option>31-38</option><option>38+</option></select>
+          </div>
+          <div class="field"><label class="field-label">¿Qué buscás?</label>
+            <select id="ob-busca"><option value="">Seleccionar…</option><option>Relación seria</option><option>Conocer personas</option><option>Salidas y diversión</option><option>Lo que surja</option></select>
+          </div>
+          <div class="field"><label class="field-label">Tu mayor obstáculo</label>
+            <select id="ob-desafio"><option value="">Seleccionar…</option><option>Romper el hielo</option><option>Mantener la conversación</option><option>Proponer la cita</option><option>Autoconfianza</option><option>Leer señales</option><option>Siempre quedo como el amigo</option></select>
+          </div>
+        </div>
+        <button class="cta-btn" onclick="finishOnboard()">ENTRAR A LA APP →</button>
+        <span class="ob-skip" onclick="enterApp({})">Saltear</span>`
     }
-    const result=await callAPI(messages,SYS_IMG);
-    if(sk)sk.classList.remove('on');
-    if(resCard)resCard.classList.add('on');
-    if(resCard)resCard.scrollIntoView({behavior:'smooth',block:'nearest'});
-    await streamText(resBody,result,10);
-    if(navigator.vibrate)navigator.vibrate([25,8,15]);
-    saveHist('Asesor de Imagen',result);
-  }catch(err){
-    if(sk)sk.classList.remove('on');
-    if(resCard)resCard.classList.add('on');
-    resBody.textContent='❌ Error: '+err.message;
-    console.error('Imagen API error:',err);
+  ];
+
+  const s = steps[step];
+  el.innerHTML = `
+    <div class="ob-badge">${s.badge}</div>
+    <h1 class="ob-h">${s.h}</h1>
+    <p class="ob-sub">${s.sub}</p>
+    ${s.content}
+    <div class="ob-dots">
+      ${steps.map((_,i)=>`<div class="ob-dot${i===step?' on':''}"></div>`).join('')}
+    </div>`;
+}
+
+function nextObStep() {
+  obStep = 1;
+  renderOnboard(1);
+}
+
+function finishOnboard() {
+  const edad = document.getElementById('ob-edad')?.value||'';
+  const busca = document.getElementById('ob-busca')?.value||'';
+  const desafio = document.getElementById('ob-desafio')?.value||'';
+  enterApp({ edad, busca, desafio });
+}
+
+function enterApp(profile) {
+  userProfile = profile;
+  localStorage.setItem('wm_onboarded','1');
+  localStorage.setItem('wm_profile', JSON.stringify(profile));
+  goHome();
+}
+
+/* ════════════════════════════════════════════
+   PWA INSTALL
+════════════════════════════════════════════ */
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  // show after 3s
+  setTimeout(() => {
+    document.getElementById('btn-install-hdr').style.display = 'block';
+    document.getElementById('ni-install').style.display = 'flex';
+  }, 3000);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btn-install-hdr').style.display = 'none';
+  document.getElementById('ni-install').style.display = 'none';
+  showToast('¡App instalada! 🎉');
+});
+
+async function doInstall() {
+  if (!deferredInstall) {
+    showToast('Usá Chrome o Edge para instalar','err');
+    return;
+  }
+  deferredInstall.prompt();
+  const { outcome } = await deferredInstall.userChoice;
+  if (outcome === 'accepted') showToast('¡Instalando… 🎉');
+  deferredInstall = null;
+}
+
+/* ════════════════════════════════════════════
+   PWA SERVICE WORKER + MANIFEST (inline)
+════════════════════════════════════════════ */
+function registerPWA() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 }
 
-/* ═══════════════════════════════════
+/* ════════════════════════════════════════════
    INIT
-═══════════════════════════════════ */
-// Set mobile greeting
-(function(){
-  const h=new Date().getHours();
-  const g=document.getElementById('m-greet');
-  if(g)g.textContent=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
-})();
+════════════════════════════════════════════ */
+function init() {
+  registerPWA();
+  buildGrid();
+  updateGreet();
 
-// Register service worker
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  const onboarded = localStorage.getItem('wm_onboarded');
+  if (onboarded) {
+    try { userProfile = JSON.parse(localStorage.getItem('wm_profile')||'{}'); } catch(e){}
+    // Check API key
+    goHome();
+  } else {
+    obStep = 0;
+    show('screen-onboard');
+    renderOnboard(0);
+    document.getElementById('bnav').style.display = 'none';
+  }
 }
 
+// Show bnav when onboarding ends
+const origEnterApp = enterApp;
+window.enterApp = function(profile) {
+  document.getElementById('bnav').style.display = 'flex';
+  origEnterApp(profile);
 
-// Deep link support
-const urlTab=new URLSearchParams(location.search).get('tab');
-if(urlTab){
-  if(IS_MOBILE()) openMPanel(urlTab);
-  else showTool(urlTab);
-}
+};
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
-
 </body>
 </html>
